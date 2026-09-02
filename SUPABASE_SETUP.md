@@ -1,46 +1,72 @@
-# Подключение общей базы Supabase
+create extension if not exists pgcrypto;
 
-Этот проект подготовлен для нескольких одновременных пользователей. Пароли хранятся через Supabase Auth, а игровые данные — в таблице `profiles`.
+create table if not exists public.profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  login text not null unique,
+  balance numeric not null default 1000,
+  history jsonb not null default '[]'::jsonb,
+  memes jsonb not null default '[]'::jsonb,
+  pending jsonb not null default '[]'::jsonb,
+  is_admin boolean not null default false,
+  created_at timestamptz not null default now()
+);
 
-## 1. Создайте проект Supabase
+alter table public.profiles enable row level security;
 
-Создайте бесплатный проект на Supabase.
+create or replace function public.is_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select coalesce((select is_admin from public.profiles where id = auth.uid()), false);
+$$;
 
-В Authentication -> Providers убедитесь, что Email включён. Для этого проекта используется технический email вида `логин@mem-battle.local`, поэтому **Confirm email** нужно отключить (Authentication -> Providers -> Email -> Confirm email = OFF).
+revoke all on function public.is_admin() from public;
+grant execute on function public.is_admin() to authenticated;
 
-## 2. Выполните SQL
+create policy "profiles_select_own_or_admin"
+on public.profiles for select
+to authenticated
+using (id = auth.uid() or public.is_admin());
 
-Откройте SQL Editor и вставьте содержимое файла `supabase_schema.sql`.
+create policy "profiles_insert_own"
+on public.profiles for insert
+to authenticated
+with check (id = auth.uid());
 
-## 3. Вставьте ключи
+create policy "profiles_update_own_or_admin"
+on public.profiles for update
+to authenticated
+using (id = auth.uid() or public.is_admin())
+with check (id = auth.uid() or public.is_admin());
 
-Откройте `supabase-config.js` и замените:
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
+declare
+  user_login text;
+begin
+  user_login := coalesce(new.raw_user_meta_data->>'login', split_part(new.email, '@', 1));
+  insert into public.profiles (id, login, balance, memes, history, pending, is_admin)
+  values (
+    new.id,
+    user_login,
+    1000,
+    '[]'::jsonb,
+    '[]'::jsonb,
+    '[]'::jsonb,
+    false
+  )
+  on conflict (id) do nothing;
+  return new;
+end;
+$$;
 
-- `PASTE_YOUR_SUPABASE_URL_HERE` на Project URL
-- `PASTE_YOUR_SUPABASE_ANON_KEY_HERE` на anon/public key
-
-Anon/public key можно использовать в браузере. **Никогда не вставляйте service_role key в сайт.**
-
-## 4. Первый администратор
-
-Зарегистрируйте аккаунт `egor007` через сайт. Затем в SQL Editor выполните:
-
-```sql
-update public.profiles set is_admin = true where login = 'egor007';
-```
-
-После этого `egor007` увидит вкладку администратора.
-
-## 5. Что теперь работает
-
-- несколько пользователей могут войти одновременно с разных устройств/браузеров;
-- регистрация и вход идут через Supabase Auth;
-- баланс, история, мемы и заявки сохраняются в общей БД;
-- страница «Топ» читает общий список пользователей;
-- отправленные мемы сохраняются в БД;
-- админка видит пользователей из общей БД;
-- изменения профиля больше не зависят от localStorage.
-
-## Важно про битвы
-
-Текущая механика таймеров и конкретных батлов в старом проекте была полностью браузерной. В этой версии пользовательские данные общие, но сами текущие раунды ещё не являются серверными realtime-батлами. Для настоящей общей комнаты, где два игрока видят один и тот же батл и ставки друг друга в реальном времени, нужна отдельная таблица `battles`/`bets` и Realtime.
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+after insert on auth.users
+for each row execute procedure public.handle_new_user();
