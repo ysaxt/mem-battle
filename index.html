@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мем Битва – Битвы</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <div class="logo">
+      <h1>⚡ Мем Битва</h1>
+      <span id="userGreeting">рейтинг + модерация</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <div class="balance-box" id="headerBalance">🪙 500</div>
+      <button id="logoutBtn" style="background:#cc3333; border:none; padding:6px 16px; border-radius:40px; font-weight:700; color:#fff; cursor:pointer;">Выйти</button>
+    </div>
+  </header>
+
+  <!-- Навигация -->
+  <div class="tabs">
+    <a href="index.html" class="tab-btn active">🏆 Битвы</a>
+    <a href="profile.html" class="tab-btn">👤 Профиль</a>
+    <a href="top.html" class="tab-btn">📊 Топ</a>
+    <a href="submit.html" class="tab-btn">📤 Отправить мем</a>
+    <a href="admin.html" class="tab-btn" id="adminTab">🛡️ Админ</a>
+  </div>
+
+
+</div>
+
+<!-- МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-box">
+    <h2>⚠️ Подтверждение ставки</h2>
+    <p id="modalMessage">Вы собираетесь поставить ...</p>
+    <div class="modal-actions">
+      <button class="confirm-btn" onclick="confirmBet()">✅ Да</button>
+      <button class="cancel-btn" onclick="closeModal()">❌ Нет</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="common.js"></script>
+<script>
+(async function(){
+  await initializeApp();
+
+  // ============================================================
+  //  ПРОВЕРКА АВТОРИЗАЦИИ
+  // ============================================================
+  if (!getCurrentUser()) {
+    window.location.href = 'login.html';
+  }
+
+  // Показать/скрыть админ-вкладку
+  if (!isAdmin()) {
+    document.getElementById('adminTab').style.display = 'none';
+  }
+
+  // Приветствие и выход
+  document.getElementById('userGreeting').textContent = `привет, ${getCurrentUser()}`;
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    logoutUser();
+    window.location.href = 'login.html';
+  });
+
+  // ============================================================
+  //  СПЕЦИФИЧНЫЙ КОД ДЛЯ БИТВ
+  // ============================================================
+  let battles = [];
+  const playerId = getCurrentUser(); // используем логин как ID
+
+  function initBattles() {
+    const data = getCurrentUserData();
+    if (!data) return;
+    updateBalanceHeader();
+    createBattles(data);
+    battles.forEach(b => startBattleTimer(b));
+  }
+
+  const BATTLE_TIMES = [30, 60, 90, 120];
+  const TIERS = ['low', 'mid', 'high', 'top'];
+
+  function createBattles(data) {
+    battles = [];
+    BATTLE_TIMES.forEach((time, idx) => {
+      const tier = TIERS[idx];
+      let m1, m2;
+      let attempts = 0;
+      do {
+        m1 = getRandomMemeFromTier(data, tier);
+        m2 = getRandomMemeFromTier(data, tier);
+        attempts++;
+      } while (m1.path === m2.path && attempts < 20);
+      if (m1.path === m2.path) {
+        const others = data.memes.filter(m => m.path !== m1.path);
+        if (others.length > 0) m2 = others[Math.floor(Math.random() * others.length)];
+      }
+      battles.push({
+        id: idx,
+        time: time,
+        timeLeft: time,
+        meme1: m1.path,
+        meme2: m2.path,
+        bets: { meme1: [], meme2: [] },
+        active: true,
+        timerInterval: null,
+        memeObj1: m1,
+        memeObj2: m2,
+      });
+    });
+    renderBattles();
+  }
+
+  function renderBattles() {
+    const container = document.getElementById('battlesContainer');
+    container.innerHTML = '';
+    battles.forEach((b, idx) => {
+      const card = document.createElement('div');
+      card.className = 'battle-card';
+      card.dataset.battleId = idx;
+      card.innerHTML = `
+        <div class="battle-header">
+          <div class="battle-title">⚔️ Батл #${idx+1} (${b.time} сек)</div>
+          <div class="battle-timer" id="timer_${idx}">⏱️ ${b.timeLeft}</div>
+        </div>
+        <div class="battle-memes">
+          <div class="meme-item">
+            <img src="${b.meme1}" alt="Мем 1" onerror="this.src='https://via.placeholder.com/200x200/22224a/ffffff?text=МЕМ+A'" />
+          </div>
+          <div class="vs-small">VS</div>
+          <div class="meme-item">
+            <img src="${b.meme2}" alt="Мем 2" onerror="this.src='https://via.placeholder.com/200x200/22224a/ffffff?text=МЕМ+B'" />
+          </div>
+        </div>
+        <div class="battle-bets">
+          <div class="bet-group">
+            <input type="number" id="bet_${idx}_1" value="10" min="1" step="1" />
+            <button id="betBtn_${idx}_1" onclick="showConfirmModal(${idx}, 'meme1', parseInt(document.getElementById('bet_${idx}_1').value))">Ставка</button>
+          </div>
+          <div class="bet-group">
+            <input type="number" id="bet_${idx}_2" value="10" min="1" step="1" />
+            <button id="betBtn_${idx}_2" onclick="showConfirmModal(${idx}, 'meme2', parseInt(document.getElementById('bet_${idx}_2').value))">Ставка</button>
+          </div>
+        </div>
+        <div id="betDisplay_${idx}" style="color:#88ff88; font-size:0.9rem; margin-top:4px;">💵 Вы ещё не ставили</div>
+      `;
+      container.appendChild(card);
+    });
+    battles.forEach((b, idx) => updateBetDisplay(idx));
+  }
+
+  function updateBetDisplay(battleIdx) {
+    const battle = battles[battleIdx];
+    if (!battle) return;
+    const displayEl = document.getElementById(`betDisplay_${battleIdx}`);
+    if (!displayEl) return;
+    const playerBetInfo = getPlayerBetInfo(battle, playerId);
+    if (playerBetInfo) {
+      const parts = [];
+      if (playerBetInfo.meme1 > 0) parts.push(`МЕМ 1: ${playerBetInfo.meme1}`);
+      if (playerBetInfo.meme2 > 0) parts.push(`МЕМ 2: ${playerBetInfo.meme2}`);
+      displayEl.textContent = `💵 Ваша ставка: ${parts.join(' | ')}`;
+    } else {
+      displayEl.textContent = '💵 Вы ещё не ставили';
+    }
+  }
+
+  // Функция, вызываемая после подтверждения
+  window.placeBetConfirmed = function(battleIdx, memeId, amount) {
+    const battle = battles[battleIdx];
+    if (!battle) return;
+    if (battle.timeLeft <= 0) {
+      alert('Этот батл завершается, подождите.');
+      return;
+    }
+    if (isNaN(amount) || amount <= 0) {
+      alert('Введите положительную сумму.');
+      return;
+    }
+    const data = getCurrentUserData();
+    if (!data) return;
+    if (amount > data.balance) {
+      alert(`Недостаточно средств! Баланс: ${data.balance}`);
+      return;
+    }
+
+    const allBets = battle.bets.meme1.concat(battle.bets.meme2);
+    const alreadyVoted = allBets.some(bet => bet.playerId === playerId);
+    if (alreadyVoted) {
+      const playerBets = battle.bets[memeId].filter(bet => bet.playerId === playerId);
+      if (playerBets.length === 0) {
+        alert('Вы уже проголосовали за другой мем в этом батле!');
+        return;
+      }
+    }
+
+    data.balance -= amount;
+    battle.bets[memeId].push({ playerId, amount });
+    data.history.push(`Ставка ${amount} на Батл #${battleIdx+1} ${memeId === 'meme1' ? 'МЕМ 1' : 'МЕМ 2'}`);
+    saveCurrentUserData();
+    updateBetDisplay(battleIdx);
+    updateBalanceHeader();
+  };
+
+  function startBattleTimer(battle) {
+    if (battle.timerInterval) clearInterval(battle.timerInterval);
+    battle.timeLeft = battle.time;
+    const timerEl = document.getElementById(`timer_${battle.id}`);
+    if (timerEl) timerEl.textContent = `⏱️ ${battle.timeLeft}`;
+    battle.timerInterval = setInterval(() => {
+      battle.timeLeft--;
+      if (timerEl) timerEl.textContent = `⏱️ ${battle.timeLeft}`;
+      if (battle.timeLeft <= 0) {
+        clearInterval(battle.timerInterval);
+        finishBattle(battle);
+      }
+    }, 1000);
+  }
+
+  function finishBattle(battle) {
+    const btn1 = document.getElementById(`betBtn_${battle.id}_1`);
+    const btn2 = document.getElementById(`betBtn_${battle.id}_2`);
+    if (btn1) btn1.disabled = true;
+    if (btn2) btn2.disabled = true;
+
+    const data = getCurrentUserData();
+    if (!data) return;
+    const count1 = new Set(battle.bets.meme1.map(bet => bet.playerId)).size;
+    const count2 = new Set(battle.bets.meme2.map(bet => bet.playerId)).size;
+
+    if (count1 === 0 && count2 === 0) {
+      resetBattle(battle, data);
+      return;
+    }
+
+    let winnerId = null, winnerObj = null;
+    if (count1 > count2) { winnerId = 'meme1'; winnerObj = battle.memeObj1; }
+    else if (count2 > count1) { winnerId = 'meme2'; winnerObj = battle.memeObj2; }
+    else {
+      for (let id of ['meme1', 'meme2']) {
+        for (let bet of battle.bets[id]) {
+          data.balance += bet.amount;
+          data.history.push(`Возврат ${bet.amount} (ничья, Батл #${battle.id+1})`);
+        }
+        battle.bets[id] = [];
+      }
+      saveCurrentUserData();
+      resetBattle(battle, data);
+      return;
+    }
+
+    const loserId = winnerId === 'meme1' ? 'meme2' : 'meme1';
+    const winnerBets = battle.bets[winnerId];
+    const loserBets = battle.bets[loserId];
+    const totalWinner = winnerBets.reduce((sum, bet) => sum + bet.amount, 0);
+    const totalLoser = loserBets.reduce((sum, bet) => sum + bet.amount, 0);
+    if (totalWinner === 0) { resetBattle(battle, data); return; }
+
+    const pool = totalLoser;
+    let totalPayout = 0;
+    for (let bet of winnerBets) {
+      const share = bet.amount / totalWinner;
+      const winAmount = bet.amount + share * pool;
+      data.balance += winAmount;
+      totalPayout += winAmount;
+      data.history.push(`Выигрыш ${Math.round(winAmount)} (Батл #${battle.id+1}, ставка ${bet.amount})`);
+    }
+    for (let bet of loserBets) {
+      data.history.push(`Проигрыш ${bet.amount} (Батл #${battle.id+1})`);
+    }
+
+    if (winnerObj) {
+      const mem = data.memes.find(m => m.path === winnerObj.path);
+      if (mem) mem.wins += 1;
+    }
+
+    battle.bets = { meme1: [], meme2: [] };
+    saveCurrentUserData();
+    setTimeout(() => resetBattle(battle, data), 2000);
+  }
+
+  function resetBattle(battle, data) {
+    const tier = TIERS[battle.id];
+    let m1, m2;
+    let attempts = 0;
+    do {
+      m1 = getRandomMemeFromTier(data, tier);
+      m2 = getRandomMemeFromTier(data, tier);
+      attempts++;
+    } while (m1.path === m2.path && attempts < 20);
+    if (m1.path === m2.path) {
+      const others = data.memes.filter(m => m.path !== m1.path);
+      if (others.length > 0) m2 = others[Math.floor(Math.random() * others.length)];
+    }
+    battle.meme1 = m1.path;
+    battle.meme2 = m2.path;
+    battle.memeObj1 = m1;
+    battle.memeObj2 = m2;
+    battle.bets = { meme1: [], meme2: [] };
+    battle.timeLeft = battle.time;
+    const btn1 = document.getElementById(`betBtn_${battle.id}_1`);
+    const btn2 = document.getElementById(`betBtn_${battle.id}_2`);
+    if (btn1) btn1.disabled = false;
+    if (btn2) btn2.disabled = false;
+    const timerEl = document.getElementById(`timer_${battle.id}`);
+    if (timerEl) timerEl.textContent = `⏱️ ${battle.timeLeft}`;
+    // обновляем картинки
+    const img1 = document.querySelector(`#battlesContainer .battle-card[data-battle-id="${battle.id}"] .meme-item:first-child img`);
+    const img2 = document.querySelector(`#battlesContainer .battle-card[data-battle-id="${battle.id}"] .meme-item:last-child img`);
+    if (img1) img1.src = battle.meme1;
+    if (img2) img2.src = battle.meme2;
+    updateBetDisplay(battle.id);
+    startBattleTimer(battle);
+    updateBalanceHeader();
+  }
+
+  // Событие при принятии мема в админке – перезапускаем битвы
+  window.addEventListener('memeAccepted', () => {
+    const data = getCurrentUserData();
+    if (!data) return;
+    battles.forEach(b => clearInterval(b.timerInterval));
+    createBattles(data);
+    battles.forEach(b => startBattleTimer(b));
+    updateBalanceHeader();
+  });
+
+  // ============================================================
+  //  ЗАПУСК ВСЕХ ФУНКЦИЙ
+  // ============================================================
+  
+  // Инициализация битв
+  initBattles();
+})();
+</script>
+</body>
+</html>
