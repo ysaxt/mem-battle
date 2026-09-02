@@ -42,7 +42,8 @@
   (async function(){
   await initializeApp();
   if (!getCurrentUser()) {
-    window.location.href = 'login.html';
+    window.location.replace('login.html');
+    return;
   }
   // Скрыть админ-вкладку, если не админ
   const adminTab = document.getElementById('adminTab');
@@ -50,9 +51,9 @@
     adminTab.style.display = 'none';
   }
   document.getElementById('userGreeting').textContent = `привет, ${getCurrentUser()}`;
-  document.getElementById('logoutBtn').addEventListener('click', () => {
-    logoutUser();
-    window.location.href = 'login.html';
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await logoutUser();
+    window.location.replace('login.html');
   });
 
   {

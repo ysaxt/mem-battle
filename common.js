@@ -39,10 +39,31 @@ async function initializeApp() {
 async function loadCurrentProfile(id) {
   if (!supabase) return null;
   const { data, error } = await supabase.from('profiles').select('*').eq('id', id).single();
-  if (error || !data) { console.error('Не удалось загрузить профиль', error); return null; }
+  if (error || !data) {
+    console.error('Не удалось загрузить профиль', error);
+    currentUser = null;
+    currentUserData = null;
+    // Сессию без профиля не оставляем: иначе сайт выглядит как будто вошёл неизвестный пользователь.
+    try { await supabase.auth.signOut(); } catch (_) {}
+    return null;
+  }
   currentUserData = rowToData(data);
   currentUser = currentUserData.login;
   usersCache[currentUser] = currentUserData;
+
+  // Старые/новые аккаунты могли получить пустой список мемов из триггера.
+  // Засеиваем его штатным набором один раз.
+  if (!Array.isArray(currentUserData.memes) || currentUserData.memes.length === 0) {
+    currentUserData.memes = MEMES_LIST.map(path => ({path, wins: 0}));
+    const { data: updated, error: seedError } = await supabase
+      .from('profiles')
+      .update({ memes: currentUserData.memes })
+      .eq('id', id)
+      .select('*')
+      .single();
+    if (!seedError && updated) currentUserData = rowToData(updated);
+    usersCache[currentUser] = currentUserData;
+  }
   return currentUserData;
 }
 
@@ -71,7 +92,7 @@ async function registerUser(login, password) {
   return {success:true};
 }
 
-async function logoutUser() { if (supabase) await supabase.auth.signOut(); currentUser=null; currentUserData=null; }
+async function logoutUser() { if (supabase) { try { await supabase.auth.signOut(); } catch (e) { console.error(e); } } currentUser=null; currentUserData=null; }
 
 async function saveCurrentUserData() {
   if (!supabase || !currentUserData?.id) return {success:false};

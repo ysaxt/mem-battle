@@ -42,15 +42,16 @@
   (async function(){
   await initializeApp();
   if (!getCurrentUser()) {
-    window.location.href = 'login.html';
+    window.location.replace('login.html');
+    return;
   }
   if (!isAdmin()) {
     document.getElementById('adminTab').style.display = 'none';
   }
   document.getElementById('userGreeting').textContent = `привет, ${getCurrentUser()}`;
-  document.getElementById('logoutBtn').addEventListener('click', () => {
-    logoutUser();
-    window.location.href = 'login.html';
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await logoutUser();
+    window.location.replace('login.html');
   });
 
   {
