@@ -88,10 +88,21 @@ if (sessionError || !sessionData.session) {
 
   // Выход
   logoutBtn.addEventListener('click', async () => {
-    await supabaseClient.auth.signOut();
-    location.href = 'login.html';
-  });
+  logoutBtn.disabled = true;
+  logoutBtn.textContent = 'Выход...';
 
+  try {
+    const { error } = await supabaseClient.auth.signOut();
+
+    if (error) throw error;
+
+    location.replace('login.html');
+  } catch (error) {
+    alert('Ошибка выхода: ' + error.message);
+    logoutBtn.disabled = false;
+    logoutBtn.textContent = 'Выйти';
+  }
+});
   // Загрузка профиля
   async function loadProfile() {
     const { data, error } = await supabaseClient
