@@ -12,57 +12,41 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      background: #151522;
+      background: #111;
       color: white;
       font-family: Arial, sans-serif;
     }
-    h1 {
-      font-size: clamp(48px, 12vw, 100px);
-      text-align: center;
-    }
+    h1 { font-size: 64px; }
     button {
       display: block;
       margin: 30px auto;
-      padding: 12px 28px;
-      border: 0;
-      border-radius: 10px;
-      background: #cc3333;
-      color: white;
+      padding: 12px 25px;
       cursor: pointer;
     }
   </style>
 </head>
 <body>
+  <div id="content">ПРОВЕРКА...</div>
 
-<div>
-  <h1>УСПЕШНО</h1>
-  <button id="logoutBtn">Выйти</button>
-</div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <script>
+    (async () => {
+      const { data, error } = await supabaseClient.auth.getSession();
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js"></script>
+      if (error || !data.session) {
+        location.replace('login.html');
+        return;
+      }
 
-<script>
-(async () => {
-  const { data, error } = await supabaseClient.auth.getSession();
+      document.getElementById('content').innerHTML =
+        '<h1>УСПЕШНО</h1><button id="logout">Выйти</button>';
 
-  if (error || !data.session) {
-    location.replace('login.html');
-    return;
-  }
-
-  document.getElementById('logoutBtn').onclick = async () => {
-    const { error } = await supabaseClient.auth.signOut();
-
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    location.replace('login.html');
-  };
-})();
-</script>
-
+      document.getElementById('logout').onclick = async () => {
+        await supabaseClient.auth.signOut();
+        location.replace('login.html');
+      };
+    })();
+  </script>
 </body>
 </html>
