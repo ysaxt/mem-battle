@@ -11,9 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -35,6 +33,11 @@
       flex-wrap: wrap;
     }
 
+    .left-side {
+      display: flex;
+      flex-direction: column;
+    }
+
     .logo {
       font-family: 'Russo One', sans-serif;
       font-size: 32px;
@@ -43,9 +46,7 @@
       letter-spacing: 1px;
     }
 
-    .logo span {
-      color: #e53945;
-    }
+    .logo span { color: #e53945; }
 
     .navigation {
       display: flex;
@@ -71,11 +72,6 @@
       color: white;
     }
 
-    .left-side {
-      display: flex;
-      flex-direction: column;
-    }
-
     .right-side {
       display: flex;
       align-items: center;
@@ -83,9 +79,7 @@
       flex-wrap: wrap;
     }
 
-    .user-info {
-      text-align: right;
-    }
+    .user-info { text-align: right; }
 
     .username {
       font-weight: 800;
@@ -112,146 +106,249 @@
       border-radius: 9px;
       font-weight: 700;
       cursor: pointer;
-      transition: 0.2s;
     }
 
-    .logout:hover {
-      background: #c62835;
-    }
+    .logout:hover { background: #c62835; }
 
     main {
       max-width: 1200px;
-      margin: 60px auto;
+      margin: 45px auto;
       padding: 0 25px;
     }
 
-    .welcome {
+    .battle-heading {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .battle-heading h1 {
+      font-family: 'Russo One', sans-serif;
+      color: #1769e0;
+      font-size: 34px;
+      margin: 0 0 10px;
+    }
+
+    .battle-heading h1 span { color: #e53945; }
+
+    .battle-heading p {
+      color: #71809b;
+      margin: 0;
+    }
+
+    .battle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px;
+    }
+
+    .meme-card {
       background: white;
       border: 2px solid #dce7ff;
-      border-radius: 20px;
-      padding: 45px;
+      border-radius: 18px;
+      padding: 18px;
       box-shadow: 0 10px 35px rgba(30, 80, 160, 0.08);
+      text-align: center;
+      min-width: 0;
     }
 
-    .welcome h1 {
-      margin: 0 0 15px;
-      font-family: 'Russo One', sans-serif;
-      font-size: 36px;
-      color: #1769e0;
+    .meme-card img {
+      width: 100%;
+      height: 350px;
+      object-fit: contain;
+      background: #f8faff;
+      border-radius: 12px;
     }
 
-    .welcome h1 span {
+    .meme-card button {
+      width: 100%;
+      margin-top: 15px;
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      background: #1769e0;
+      color: white;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .meme-card button:hover { background: #0d50b5; }
+
+    .meme-card button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .vs {
+      text-align: center;
       color: #e53945;
+      font-family: 'Russo One', sans-serif;
+      font-size: 24px;
+      margin: 20px 0;
+      display: none;
     }
 
-    .welcome p {
+    #message {
+      text-align: center;
       color: #71809b;
       font-size: 16px;
+      margin: 30px 0;
     }
 
     @media (max-width: 700px) {
-      header {
-        align-items: flex-start;
-      }
-
+      header { align-items: flex-start; }
       .right-side {
         width: 100%;
         justify-content: space-between;
       }
-
-      .navigation {
-        gap: 7px;
-      }
-
-      .navigation a {
-        padding: 10px 12px;
-      }
-
-      .welcome {
-        padding: 25px;
-      }
-
-      .welcome h1 {
-        font-size: 27px;
-      }
+      .navigation { gap: 7px; }
+      .navigation a { padding: 10px 12px; }
+      .battle { grid-template-columns: 1fr; }
+      .battle-heading h1 { font-size: 27px; }
+      .meme-card img { height: 280px; }
+      .vs { display: block; }
     }
   </style>
 </head>
 
 <body>
 
-  <header>
-    <div class="left-side">
-      <a href="index.html" class="logo">MEM <span>BATTLE</span></a>
+<header>
+  <div class="left-side">
+    <a href="index.html" class="logo">MEM <span>BATTLE</span></a>
 
-      <nav class="navigation">
-        <a href="index.html" class="active">Главная</a>
-        <a href="profile.html">Профиль</a>
-        <a href="submit.html">Отправить мем</a>
-        <a href="top.html">Топ</a>
-      </nav>
+    <nav class="navigation">
+      <a href="index.html" class="active">Главная</a>
+      <a href="profile.html">Профиль</a>
+      <a href="submit.html">Отправить мем</a>
+      <a href="top.html">Топ</a>
+    </nav>
+  </div>
+
+  <div class="right-side">
+    <div class="user-info">
+      <div class="username" id="username">Загрузка...</div>
+      <div class="balance">Баланс: <span id="balance">...</span></div>
+    </div>
+    <button class="logout" id="logoutBtn">Выйти</button>
+  </div>
+</header>
+
+<main>
+  <div class="battle-heading">
+    <h1>МЕМ <span>БАТЛЫ</span></h1>
+    <p>Какой мем лучше? Решать тебе!</p>
+  </div>
+
+  <div id="message">Загружаем мемы...</div>
+
+  <div class="battle" id="battle" style="display:none">
+    <div class="meme-card">
+      <img id="memeA" src="" alt="Первый мем">
+      <button id="voteA">Выбрать этот мем</button>
     </div>
 
-    <div class="right-side">
-      <div class="user-info">
-        <div class="username" id="username">Загрузка...</div>
-        <div class="balance">Баланс: <span id="balance">...</span></div>
-      </div>
-
-      <button class="logout" id="logoutBtn">Выйти</button>
+    <div class="meme-card">
+      <img id="memeB" src="" alt="Второй мем">
+      <button id="voteB">Выбрать этот мем</button>
     </div>
-  </header>
+  </div>
+</main>
 
-  <main>
-    <section class="welcome">
-      <h1>Добро пожаловать в <span>MEM BATTLE!</span></h1>
-      <p>Готов к мемным баталиям? Скоро здесь начнутся настоящие сражения!</p>
-    </section>
-  </main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase.js"></script>
+<script>
+  let currentMemes = [];
 
-  <script>
-    async function initPage() {
-      const { data, error } = await supabaseClient.auth.getSession();
+  async function initPage() {
+    const { data, error } = await supabaseClient.auth.getSession();
 
-      if (error || !data.session) {
-        location.replace('login.html');
-        return;
-      }
-
-      const user = data.session.user;
-
-      const { data: profile, error: profileError } = await supabaseClient
-        .from('profiles')
-        .select('username, coins')
-        .eq('id', user.id)
-        .single();
-
-      if (profileError || !profile) {
-        document.getElementById('username').textContent = 'Пользователь';
-        document.getElementById('balance').textContent = 'Ошибка загрузки';
-      } else {
-        document.getElementById('username').textContent = profile.username;
-        document.getElementById('balance').textContent =
-          Number(profile.coins).toLocaleString('ru-RU');
-      }
+    if (error || !data.session) {
+      location.replace('login.html');
+      return;
     }
 
-    document.getElementById('logoutBtn').onclick = async () => {
-      const { error } = await supabaseClient.auth.signOut();
+    const user = data.session.user;
 
-      if (error) {
-        alert('Не удалось выйти: ' + error.message);
-        return;
-      }
+    const { data: profile, error: profileError } = await supabaseClient
+      .from('profiles')
+      .select('username, coins')
+      .eq('id', user.id)
+      .single();
 
-      location.replace('login.html');
-    };
+    if (profileError || !profile) {
+      document.getElementById('username').textContent = 'Пользователь';
+      document.getElementById('balance').textContent = 'Ошибка';
+    } else {
+      document.getElementById('username').textContent = profile.username;
+      document.getElementById('balance').textContent =
+        Number(profile.coins).toLocaleString('ru-RU');
+    }
 
-    initPage();
-  </script>
+    await loadBattle();
+  }
+
+  async function loadBattle() {
+    const message = document.getElementById('message');
+    const battle = document.getElementById('battle');
+
+    message.textContent = 'Загружаем мемы...';
+    battle.style.display = 'none';
+
+    const { data, error } = await supabaseClient
+      .from('memes')
+      .select('id, image_url, wins')
+      .eq('wins', 0);
+
+    if (error) {
+      message.textContent = 'Ошибка загрузки мемов: ' + error.message;
+      return;
+    }
+
+    if (!data || data.length < 2) {
+      message.textContent = 'Пока недостаточно мемов для батла. Нужно минимум два.';
+      return;
+    }
+
+    const shuffled = [...data].sort(() => Math.random() - 0.5);
+
+    currentMemes = shuffled.slice(0, 2);
+
+    document.getElementById('memeA').src = currentMemes[0].image_url;
+    document.getElementById('memeB').src = currentMemes[1].image_url;
+
+    battle.style.display = 'grid';
+    message.textContent = '';
+  }
+
+  document.getElementById('voteA').onclick = () => nextBattle();
+  document.getElementById('voteB').onclick = () => nextBattle();
+
+  async function nextBattle() {
+    document.getElementById('voteA').disabled = true;
+    document.getElementById('voteB').disabled = true;
+
+    await loadBattle();
+
+    document.getElementById('voteA').disabled = false;
+    document.getElementById('voteB').disabled = false;
+  }
+
+  document.getElementById('logoutBtn').onclick = async () => {
+    const { error } = await supabaseClient.auth.signOut();
+
+    if (error) {
+      alert('Не удалось выйти: ' + error.message);
+      return;
+    }
+
+    location.replace('login.html');
+  };
+
+  initPage();
+</script>
 
 </body>
 </html>
