@@ -301,7 +301,7 @@
           await supabaseClient.auth.getUser();
 
         if (authError || !user) {
-          throw new Error('Сначала войди в аккаунт.');
+          throw new Error('Сначала, войди в аккаунт.');
         }
 
         const extension = selectedFile.name.split('.').pop().toLowerCase();
