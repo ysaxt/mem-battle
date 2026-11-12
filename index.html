@@ -506,7 +506,6 @@
 
           <button class="vote-button vote-a">Поставить и выбрать</button>
 
-          <div class="vote-count count-a">Участников: 0</div>
         </div>
 
         <div class="meme-card card-b">
@@ -521,8 +520,6 @@
           >
 
           <button class="vote-button vote-b">Поставить и выбрать</button>
-
-          <div class="vote-count count-b">Участников: 0</div>
         </div>
       </div>
 
@@ -567,11 +564,6 @@
       imageB.src = row.meme_b_url;
     }
 
-    card.querySelector('.count-a').textContent =
-      'Участников: ' + (row.votes_a || 0);
-
-    card.querySelector('.count-b').textContent =
-      'Участников: ' + (row.votes_b || 0);
 
     const timer = card.querySelector('.battle-timer');
 
