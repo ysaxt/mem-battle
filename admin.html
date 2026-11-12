@@ -73,6 +73,7 @@
     .subtitle {
       color: #77869e;
       margin-bottom: 25px;
+      line-height: 1.6;
     }
 
     .toolbar {
@@ -111,8 +112,6 @@
     .btn-red { background: #ed5353; }
     .btn-red:hover { background: #d83c3c; }
 
-    .btn-blue:hover { background: #1558bd; }
-
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -139,7 +138,6 @@
       color: #77869e;
       font-size: 12px;
       margin: 12px 0;
-      overflow-wrap: anywhere;
     }
 
     .actions {
@@ -147,9 +145,7 @@
       gap: 9px;
     }
 
-    .actions button {
-      flex: 1;
-    }
+    .actions button { flex: 1; }
 
     .empty, .notice {
       background: white;
@@ -175,197 +171,208 @@
 </head>
 
 <body>
-  <div class="app">
+<div class="app">
 
-    <header class="header">
-      <a href="index.html" class="logo">МЕМ БИТВА</a>
+  <header class="header">
+    <a href="index.html" class="logo">МЕМ БИТВА</a>
 
-      <nav class="nav">
-        <a href="index.html">Битвы</a>
-        <a href="submit.html">Отправить мем</a>
-        <a href="top.html">Топ</a>
-        <a href="profile.html">Профиль</a>
-        <a href="admin.html" class="active">Модерация</a>
-      </nav>
-    </header>
+    <nav class="nav">
+      <a href="index.html">Битвы</a>
+      <a href="submit.html">Отправить мем</a>
+      <a href="top.html">Топ</a>
+      <a href="profile.html">Профиль</a>
+      <a href="admin.html" class="active">Модерация</a>
+    </nav>
+  </header>
 
-    <h1 class="page-title">Модерация мемов</h1>
-    <p class="subtitle">
-      Проверяй новые мемы и решай, какие попадут в битвы.
-    </p>
+  <h1 class="page-title">Модерация мемов</h1>
+  <p class="subtitle">
+    Проверяй новые мемы и решай, какие попадут в битвы.
+  </p>
 
-    <div class="toolbar">
-      <div class="count" id="count">Загрузка...</div>
-      <button class="btn btn-blue" id="refreshBtn">Обновить</button>
-    </div>
-
-    <div id="content">
-      <div class="empty">Загружаем мемы...</div>
-    </div>
-
+  <div class="toolbar">
+    <div class="count" id="count">Загрузка...</div>
+    <button class="btn" id="refreshBtn">Обновить</button>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase.js"></script>
+  <div id="content">
+    <div class="empty">Загружаем мемы...</div>
+  </div>
 
-  <script>
-    const content = document.getElementById('content');
-    const count = document.getElementById('count');
-    const refreshBtn = document.getElementById('refreshBtn');
+</div>
 
-    function showNotice(text, isError = false) {
-      content.replaceChildren();
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 
-      const notice = document.createElement('div');
-      notice.className = 'notice' + (isError ? ' error' : '');
-      notice.textContent = text;
+<script>
+  const content = document.getElementById('content');
+  const count = document.getElementById('count');
+  const refreshBtn = document.getElementById('refreshBtn');
 
-      content.appendChild(notice);
+  function showNotice(text, isError = false) {
+    content.replaceChildren();
+
+    const notice = document.createElement('div');
+    notice.className = 'notice' + (isError ? ' error' : '');
+    notice.textContent = text;
+
+    content.appendChild(notice);
+  }
+
+  function createMemeCard(meme) {
+    const card = document.createElement('article');
+    card.className = 'meme-card';
+
+    const img = document.createElement('img');
+    img.className = 'meme-image';
+    img.src = meme.image_url;
+    img.alt = 'Мем на модерации';
+    img.loading = 'lazy';
+
+    const info = document.createElement('div');
+    info.className = 'meme-info';
+    info.textContent = 'Отправлен: ' +
+      new Date(meme.created_at).toLocaleString('ru-RU');
+
+    const actions = document.createElement('div');
+    actions.className = 'actions';
+
+    const approveBtn = document.createElement('button');
+    approveBtn.className = 'btn btn-green';
+    approveBtn.textContent = 'Одобрить';
+
+    const rejectBtn = document.createElement('button');
+    rejectBtn.className = 'btn btn-red';
+    rejectBtn.textContent = 'Отклонить';
+
+    approveBtn.addEventListener('click', () => {
+      moderateMeme(meme.id, 'approved', null, card, approveBtn, rejectBtn);
+    });
+
+    rejectBtn.addEventListener('click', () => {
+      const reason = prompt('Укажи причину отклонения:');
+
+      if (reason === null) return;
+
+      if (!reason.trim()) {
+        alert('Причина обязательна.');
+        return;
+      }
+
+      if (reason.trim().length > 500) {
+        alert('Причина не должна быть длиннее 500 символов.');
+        return;
+      }
+
+      moderateMeme(meme.id, 'rejected', reason.trim(), card, approveBtn, rejectBtn);
+    });
+
+    img.addEventListener('error', () => {
+      img.alt = 'Не удалось загрузить изображение';
+    });
+
+    actions.append(approveBtn, rejectBtn);
+    card.append(img, info, actions);
+
+    return card;
+  }
+
+  async function checkAdmin() {
+    const { data: authData, error: authError } =
+      await supabaseClient.auth.getUser();
+
+    if (authError || !authData.user) {
+      showNotice('Сначала войди в свой аккаунт.', true);
+      count.textContent = '';
+      return false;
     }
 
-    function createMemeCard(meme) {
-      const card = document.createElement('article');
-      card.className = 'meme-card';
+    const { data: profile, error } = await supabaseClient
+      .from('profiles')
+      .select('role')
+      .eq('id', authData.user.id)
+      .single();
 
-      const img = document.createElement('img');
-      img.className = 'meme-image';
-      img.src = meme.image_url;
-      img.alt = 'Мем на модерации';
-      img.loading = 'lazy';
+    if (error || !profile || profile.role !== 'admin') {
+      showNotice('Доступ запрещён. Эта страница только для администратора.', true);
+      count.textContent = '';
+      return false;
+    }
 
-      const info = document.createElement('div');
-      info.className = 'meme-info';
-      info.textContent =
-        'Отправлен: ' +
-        new Date(meme.created_at).toLocaleString('ru-RU');
+    return true;
+  }
 
-      const actions = document.createElement('div');
-      actions.className = 'actions';
+  async function loadMemes() {
+    refreshBtn.disabled = true;
+    count.textContent = 'Загрузка...';
+    content.replaceChildren();
 
-      const approveBtn = document.createElement('button');
-      approveBtn.className = 'btn btn-green';
-      approveBtn.textContent = 'Одобрить';
+    try {
+      const isAdmin = await checkAdmin();
+      if (!isAdmin) return;
 
-      const rejectBtn = document.createElement('button');
-      rejectBtn.className = 'btn btn-red';
-      rejectBtn.textContent = 'Отклонить';
+      const { data: memes, error } = await supabaseClient
+        .from('memes')
+        .select('id, image_url, created_at')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: true });
 
-      approveBtn.addEventListener('click', () => {
-        moderateMeme(meme.id, 'approved', card, approveBtn, rejectBtn);
+      if (error) throw error;
+
+      count.textContent = 'На модерации: ' + memes.length;
+
+      if (memes.length === 0) {
+        showNotice('Новых мемов пока нет!');
+        return;
+      }
+
+      const grid = document.createElement('div');
+      grid.className = 'grid';
+
+      memes.forEach(meme => grid.appendChild(createMemeCard(meme)));
+      content.replaceChildren(grid);
+
+    } catch (error) {
+      console.error(error);
+      showNotice('Не удалось загрузить мемы: ' + error.message, true);
+    } finally {
+      refreshBtn.disabled = false;
+    }
+  }
+
+  async function moderateMeme(id, status, reason, card, approveBtn, rejectBtn) {
+    approveBtn.disabled = true;
+    rejectBtn.disabled = true;
+
+    try {
+      const { error } = await supabaseClient.rpc('moderate_meme', {
+        p_meme_id: id,
+        p_status: status,
+        p_reason: reason
       });
 
-      rejectBtn.addEventListener('click', () => {
-        moderateMeme(meme.id, 'rejected', card, approveBtn, rejectBtn);
-      });
+      if (error) throw error;
 
-      img.addEventListener('error', () => {
-        img.alt = 'Не удалось загрузить изображение';
-      });
+      card.remove();
 
-      actions.append(approveBtn, rejectBtn);
-      card.append(img, info, actions);
+      const current = Number(count.textContent.match(/\d+/)?.[0] || 0);
+      count.textContent = 'На модерации: ' + Math.max(0, current - 1);
 
-      return card;
-    }
-
-    async function checkAdmin() {
-      const { data: authData, error: authError } =
-        await supabaseClient.auth.getUser();
-
-      if (authError || !authData.user) {
-        showNotice('Сначала войди в свой аккаунт.', true);
-        count.textContent = '';
-        return false;
+      if (!content.querySelector('.meme-card')) {
+        showNotice('Все мемы проверены!');
       }
 
-      const { data: profile, error } = await supabaseClient
-        .from('profiles')
-        .select('role')
-        .eq('id', authData.user.id)
-        .single();
-
-      if (error || !profile || profile.role !== 'admin') {
-        showNotice('Доступ запрещён. Эта страница только для администратора.', true);
-        count.textContent = '';
-        return false;
-      }
-
-      return true;
+    } catch (error) {
+      console.error(error);
+      alert('Не удалось изменить статус: ' + error.message);
+      approveBtn.disabled = false;
+      rejectBtn.disabled = false;
     }
+  }
 
-    async function loadMemes() {
-      refreshBtn.disabled = true;
-      count.textContent = 'Загрузка...';
-      content.replaceChildren();
+  refreshBtn.addEventListener('click', loadMemes);
+  loadMemes();
+</script>
 
-      try {
-        const isAdmin = await checkAdmin();
-        if (!isAdmin) return;
-
-        const { data: memes, error } = await supabaseClient
-          .from('memes')
-          .select('id, image_url, created_at')
-          .eq('status', 'pending')
-          .order('created_at', { ascending: true });
-
-        if (error) throw error;
-
-        count.textContent = 'На модерации: ' + memes.length;
-
-        if (memes.length === 0) {
-          showNotice('Новых мемов пока нет. Отличная работа!');
-          return;
-        }
-
-        const grid = document.createElement('div');
-        grid.className = 'grid';
-
-        memes.forEach(meme => {
-          grid.appendChild(createMemeCard(meme));
-        });
-
-        content.replaceChildren(grid);
-
-      } catch (error) {
-        console.error(error);
-        showNotice('Не удалось загрузить мемы: ' + error.message, true);
-      } finally {
-        refreshBtn.disabled = false;
-      }
-    }
-
-    async function moderateMeme(id, status, card, approveBtn, rejectBtn) {
-      approveBtn.disabled = true;
-      rejectBtn.disabled = true;
-
-      try {
-        const { error } = await supabaseClient.rpc('moderate_meme', {
-          p_meme_id: id,
-          p_status: status
-        });
-
-        if (error) throw error;
-
-        card.remove();
-
-        const current = Number(count.textContent.match(/\d+/)?.[0] || 0);
-        count.textContent = 'На модерации: ' + Math.max(0, current - 1);
-
-        if (!content.querySelector('.meme-card')) {
-          showNotice('Все мемы проверены!');
-        }
-
-      } catch (error) {
-        console.error(error);
-        alert('Не удалось изменить статус: ' + error.message);
-        approveBtn.disabled = false;
-        rejectBtn.disabled = false;
-      }
-    }
-
-    refreshBtn.addEventListener('click', loadMemes);
-
-    loadMemes();
-  </script>
 </body>
 </html>
