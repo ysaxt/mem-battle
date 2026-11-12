@@ -241,6 +241,28 @@
       display: block;
     }
 
+    .bet-input {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      border: 2px solid #dce7ff;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      text-align: center;
+      outline: none;
+      color: #172b4d;
+    }
+
+    .bet-input:focus {
+      border-color: #1769e0;
+    }
+
+    .bet-input:disabled {
+      background: #f2f6ff;
+      opacity: 0.6;
+    }
+
     .vote-button {
       width: 100%;
       margin-top: 10px;
@@ -270,8 +292,6 @@
       font-size: 12px;
       font-weight: 800;
     }
-
-    .vs { display: none; }
 
     .battle-status {
       margin-top: 13px;
@@ -367,7 +387,7 @@
 <main>
   <div class="battle-heading">
     <h1>MEM <span>BATTLE</span></h1>
-    <p>Выбирай лучшие мемы во всех категориях!</p>
+    <p>Выбирай лучшие мемы и делай ставки!</p>
   </div>
 
   <div id="message">Подключаемся к батлам...</div>
@@ -390,6 +410,7 @@
   ];
 
   let currentUser = null;
+  let currentBalance = 0;
   let loadingBattles = false;
 
   const battleElements = new Map();
@@ -474,14 +495,34 @@
       <div class="battle-pair">
         <div class="meme-card card-a">
           <img class="image-a" alt="Первый мем">
-          <button class="vote-button vote-a">Выбрать мем</button>
-          <div class="vote-count count-a">Голосов: 0</div>
+
+          <input
+            class="bet-input bet-a"
+            type="number"
+            min="1"
+            step="1"
+            placeholder="Ставка монет"
+          >
+
+          <button class="vote-button vote-a">Поставить и выбрать</button>
+
+          <div class="vote-count count-a">Участников: 0</div>
         </div>
 
         <div class="meme-card card-b">
           <img class="image-b" alt="Второй мем">
-          <button class="vote-button vote-b">Выбрать мем</button>
-          <div class="vote-count count-b">Голосов: 0</div>
+
+          <input
+            class="bet-input bet-b"
+            type="number"
+            min="1"
+            step="1"
+            placeholder="Ставка монет"
+          >
+
+          <button class="vote-button vote-b">Поставить и выбрать</button>
+
+          <div class="vote-count count-b">Участников: 0</div>
         </div>
       </div>
 
@@ -489,11 +530,19 @@
     `;
 
     card.querySelector('.vote-a').addEventListener('click', () => {
-      castVote(row.battle_id, row.meme_a_id);
+      castVote(
+        row.battle_id,
+        row.meme_a_id,
+        card.querySelector('.bet-a')
+      );
     });
 
     card.querySelector('.vote-b').addEventListener('click', () => {
-      castVote(row.battle_id, row.meme_b_id);
+      castVote(
+        row.battle_id,
+        row.meme_b_id,
+        card.querySelector('.bet-b')
+      );
     });
 
     return card;
@@ -519,10 +568,10 @@
     }
 
     card.querySelector('.count-a').textContent =
-      'Голосов: ' + (row.votes_a || 0);
+      'Участников: ' + (row.votes_a || 0);
 
     card.querySelector('.count-b').textContent =
-      'Голосов: ' + (row.votes_b || 0);
+      'Участников: ' + (row.votes_b || 0);
 
     const timer = card.querySelector('.battle-timer');
 
@@ -551,11 +600,16 @@
     const voteA = card.querySelector('.vote-a');
     const voteB = card.querySelector('.vote-b');
 
+    const betA = card.querySelector('.bet-a');
+    const betB = card.querySelector('.bet-b');
+
     const status = card.querySelector('.battle-status');
 
     if (completed) {
       voteA.disabled = true;
       voteB.disabled = true;
+      betA.disabled = true;
+      betB.disabled = true;
 
       voteA.textContent = 'Раунд завершён';
       voteB.textContent = 'Раунд завершён';
@@ -567,7 +621,7 @@
       } else if (row.winner_meme_id === row.meme_b_id) {
         status.textContent = 'Победил второй мем!';
       } else {
-        status.textContent = 'Ничья!';
+        status.textContent = 'Ничья! Ставки возвращены.';
       }
 
       return;
@@ -576,9 +630,8 @@
     if (secondsLeft === 0) {
       voteA.disabled = true;
       voteB.disabled = true;
-
-      voteA.textContent = 'Время вышло';
-      voteB.textContent = 'Время вышло';
+      betA.disabled = true;
+      betB.disabled = true;
 
       status.textContent = 'Подсчитываем результаты...';
       status.className = 'battle-status';
@@ -588,6 +641,8 @@
     if (myVote) {
       voteA.disabled = true;
       voteB.disabled = true;
+      betA.disabled = true;
+      betB.disabled = true;
 
       voteA.textContent = myVote === row.meme_a_id
         ? 'Ты выбрал этот мем'
@@ -597,20 +652,23 @@
         ? 'Ты выбрал этот мем'
         : 'Голос принят';
 
-      status.textContent = 'Твой голос принят!';
+      status.textContent = 'Твоя ставка принята!';
       status.className = 'battle-status';
+
       return;
     }
 
     voteA.disabled = voting;
     voteB.disabled = voting;
+    betA.disabled = voting;
+    betB.disabled = voting;
 
-    voteA.textContent = 'Выбрать мем';
-    voteB.textContent = 'Выбрать мем';
+    voteA.textContent = 'Поставить и выбрать';
+    voteB.textContent = 'Поставить и выбрать';
 
     status.textContent = voting
-      ? 'Отправляем голос...'
-      : 'Выбери лучший мем!';
+      ? 'Отправляем ставку...'
+      : 'Выбери мем и укажи ставку!';
 
     status.className = 'battle-status';
   }
@@ -694,38 +752,75 @@
     }
   }
 
-  async function castVote(battleId, memeId) {
+  async function refreshBalance() {
+    const { data, error } = await supabaseClient
+      .from('profiles')
+      .select('coins')
+      .eq('id', currentUser.id)
+      .single();
+
+    if (error) {
+      console.error('Ошибка обновления баланса:', error);
+      return;
+    }
+
+    currentBalance = Number(data.coins);
+
+    document.getElementById('balance').textContent =
+      currentBalance.toLocaleString('ru-RU');
+  }
+
+  async function castVote(battleId, memeId, input) {
     if (votingBattles.has(battleId)) return;
 
     const card = battleElements.get(battleId);
     if (!card) return;
 
-    const buttons = card.querySelectorAll('.vote-button');
+    const betAmount = Number(input.value);
 
-    if (buttons[0].disabled || buttons[1].disabled) return;
+    if (
+      !Number.isSafeInteger(betAmount) ||
+      betAmount <= 0
+    ) {
+      alert('Укажи целое число монет больше нуля.');
+      input.focus();
+      return;
+    }
+
+    if (betAmount > currentBalance) {
+      alert('У тебя недостаточно монет!');
+      return;
+    }
 
     votingBattles.add(battleId);
+
+    const buttons = card.querySelectorAll('.vote-button');
+    const inputs = card.querySelectorAll('.bet-input');
+
     buttons.forEach(button => button.disabled = true);
+    inputs.forEach(field => field.disabled = true);
 
     card.querySelector('.battle-status').textContent =
-      'Отправляем голос...';
+      'Отправляем ставку...';
 
     try {
       const { error } = await supabaseClient.rpc('cast_battle_vote', {
         p_battle_id: battleId,
-        p_meme_id: memeId
+        p_meme_id: memeId,
+        p_bet_amount: betAmount
       });
 
       if (error) {
-        card.querySelector('.battle-status').textContent =
-          'Ошибка голосования: ' + error.message;
+        alert('Не удалось сделать ставку: ' + error.message);
+      } else {
+        await refreshBalance();
       }
 
       await refreshBattles();
 
     } catch (error) {
-      card.querySelector('.battle-status').textContent =
-        'Ошибка: ' + error.message;
+      alert('Ошибка: ' + error.message);
+
     } finally {
       votingBattles.delete(battleId);
       await refreshBattles();
@@ -753,8 +848,11 @@
       document.getElementById('balance').textContent = 'Ошибка';
     } else {
       document.getElementById('username').textContent = profile.username;
+
+      currentBalance = Number(profile.coins);
+
       document.getElementById('balance').textContent =
-        Number(profile.coins).toLocaleString('ru-RU');
+        currentBalance.toLocaleString('ru-RU');
     }
 
     createCategorySections();
@@ -767,7 +865,6 @@
       battleElements.forEach((card) => {
         const timer = card.querySelector('.battle-timer');
 
-        // Не перезаписываем результат завершённого батла.
         if (timer.textContent === 'Результат') return;
 
         const endTime = card.dataset.endsAt;
