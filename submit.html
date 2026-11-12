@@ -3,22 +3,354 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Отправить мем — Mem Battle</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мем Битва — Отправить мем</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Russo+One&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+
   <style>
-    body { background:#f2f6ff; color:#1769e0; font-family:Arial; text-align:center; padding-top:20vh; }
-    h1 { font-size:40px; }
-    a { color:#e53945; font-weight:bold; }
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: #f4f8ff;
+      color: #17233d;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .app {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+      padding: 18px 22px;
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 4px 18px rgba(30,70,130,.07);
+    }
+
+    .logo {
+      font-family: 'Russo One', sans-serif;
+      font-size: 25px;
+      color: #246bdb;
+      text-decoration: none;
+    }
+
+    .nav {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: #53627b;
+      font-weight: 700;
+      padding: 10px 14px;
+      border-radius: 10px;
+    }
+
+    .nav a:hover, .nav a.active {
+      color: #246bdb;
+      background: #eaf2ff;
+    }
+
+    .page-title {
+      margin: 35px 0 10px;
+      font-family: 'Russo One', sans-serif;
+      font-size: 30px;
+    }
+
+    .subtitle {
+      color: #8290a8;
+      margin-bottom: 24px;
+    }
+
+    .upload-card {
+      background: white;
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 5px 22px rgba(30,70,130,.07);
+    }
+
+    .upload-area {
+      border: 2px dashed #b8d2f8;
+      background: #f7faff;
+      border-radius: 16px;
+      padding: 35px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .upload-area:hover {
+      border-color: #246bdb;
+      background: #eef5ff;
+    }
+
+    .upload-icon {
+      font-size: 42px;
+      margin-bottom: 12px;
+    }
+
+    .upload-title {
+      font-weight: 800;
+      font-size: 17px;
+      margin-bottom: 7px;
+    }
+
+    .upload-hint {
+      color: #8996aa;
+      font-size: 13px;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    .preview {
+      display: none;
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .preview img {
+      max-width: 100%;
+      max-height: 350px;
+      border-radius: 14px;
+      object-fit: contain;
+    }
+
+    .file-name {
+      color: #8290a8;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+
+    .btn {
+      display: inline-block;
+      border: none;
+      border-radius: 11px;
+      padding: 14px 20px;
+      background: #246bdb;
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: none;
+      transition: .2s;
+    }
+
+    .btn:hover { background: #1558bd; }
+
+    .btn:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .submit-btn {
+      width: 100%;
+      margin-top: 22px;
+    }
+
+    .message {
+      margin-top: 18px;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .message.error { color: #e34b4b; }
+    .message.success { color: #15965b; }
+
+    .rules {
+      margin-top: 20px;
+      padding: 17px;
+      border-radius: 13px;
+      background: #f2f7ff;
+      color: #687991;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 650px) {
+      .app { padding: 12px; }
+      .header { padding: 15px; }
+      .page-title { font-size: 25px; }
+      .upload-card { padding: 18px; }
+    }
   </style>
 </head>
+
 <body>
-  <h1>Отправить мем</h1>
-  <h2>В РАЗРАБОТКЕ</h2>
-  <a href="index.html">На главную</a>
+  <div class="app">
+    <header class="header">
+      <a href="index.html" class="logo">МЕМ БИТВА</a>
+      <nav class="nav">
+        <a href="index.html">Битвы</a>
+        <a href="submit.html" class="active">Отправить мем</a>
+        <a href="top.html">Топ</a>
+        <a href="profile.html">Профиль</a>
+      </nav>
+    </header>
+
+    <h1 class="page-title">Отправить мем</h1>
+    <p class="subtitle">Загрузи свой мем и попробуй попасть в Мем Битву!</p>
+
+    <section class="upload-card">
+      <label class="upload-area" for="fileInput">
+        <div class="upload-icon">🖼️</div>
+        <div class="upload-title">Нажми, чтобы выбрать изображение</div>
+        <div class="upload-hint">JPG, PNG или WEBP. Максимум 5 МБ.</div>
+      </label>
+
+      <input
+        type="file"
+        id="fileInput"
+        accept="image/jpeg,image/png,image/webp"
+      >
+
+      <div class="preview" id="preview">
+        <img id="previewImage" alt="Предпросмотр мема">
+        <div class="file-name" id="fileName"></div>
+      </div>
+
+      <button class="btn submit-btn" id="submitBtn" disabled>
+        Отправить на проверку
+      </button>
+
+      <div class="message" id="message"></div>
+
+      <div class="rules">
+        **Перед отправкой:**
+        <br>• Максимальный размер изображения — 5 МБ.
+        <br>• Принимаются JPG, PNG и WEBP.
+        <br>• После отправки мем получит статус «На проверке».
+        <br>• Не отправляй чужие личные данные и неподходящие материалы.
+      </div>
+    </section>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
+
   <script>
-    supabaseClient.auth.getSession().then(({data}) => {
-      if (!data.session) location.replace('login.html');
+    const fileInput = document.getElementById('fileInput');
+    const preview = document.getElementById('preview');
+    const previewImage = document.getElementById('previewImage');
+    const fileName = document.getElementById('fileName');
+    const submitBtn = document.getElementById('submitBtn');
+    const message = document.getElementById('message');
+
+    let selectedFile = null;
+
+    function showMessage(text, type) {
+      message.textContent = text;
+      message.className = 'message ' + (type || '');
+    }
+
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files[0];
+
+      selectedFile = null;
+      submitBtn.disabled = true;
+      preview.style.display = 'none';
+      showMessage('');
+
+      if (!file) return;
+
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+
+      if (!allowedTypes.includes(file.type)) {
+        showMessage('Выбери изображение JPG, PNG или WEBP.', 'error');
+        fileInput.value = '';
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        showMessage('Файл слишком большой. Максимум 5 МБ.', 'error');
+        fileInput.value = '';
+        return;
+      }
+
+      selectedFile = file;
+      previewImage.src = URL.createObjectURL(file);
+      fileName.textContent = file.name;
+      preview.style.display = 'block';
+      submitBtn.disabled = false;
+    });
+
+    submitBtn.addEventListener('click', async () => {
+      if (!selectedFile) return;
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Отправляем...';
+      showMessage('');
+
+      try {
+        const { data: { user }, error: authError } =
+          await supabaseClient.auth.getUser();
+
+        if (authError || !user) {
+          throw new Error('Сначала войди в аккаунт.');
+        }
+
+        const extension = selectedFile.name.split('.').pop().toLowerCase();
+        const filePath = user.id + '/' + crypto.randomUUID() + '.' + extension;
+
+        const { error: uploadError } = await supabaseClient.storage
+          .from('memes')
+          .upload(filePath, selectedFile, {
+            cacheControl: '3600',
+            upsert: false,
+            contentType: selectedFile.type
+          });
+
+        if (uploadError) throw uploadError;
+
+        const { data: publicData } = supabaseClient.storage
+          .from('memes')
+          .getPublicUrl(filePath);
+
+        const imageUrl = publicData.publicUrl;
+
+        const { error: insertError } = await supabaseClient
+          .from('memes')
+          .insert({
+            user_id: user.id,
+            image_url: imageUrl,
+            status: 'pending',
+            wins: 0
+          });
+
+        if (insertError) {
+          throw new Error(
+            'Изображение загрузилось, но запись не сохранилась: ' +
+            insertError.message
+          );
+        }
+
+        showMessage('Мем успешно отправлен на проверку!', 'success');
+
+        selectedFile = null;
+        fileInput.value = '';
+        preview.style.display = 'none';
+        submitBtn.disabled = true;
+      } catch (error) {
+        showMessage(error.message || 'Произошла ошибка при отправке.', 'error');
+        submitBtn.disabled = !selectedFile;
+      } finally {
+        submitBtn.textContent = 'Отправить на проверку';
+      }
     });
   </script>
 </body>
