@@ -5,43 +5,88 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Авторизация — Мем Битва</title>
-  <style>
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: #151522;
-      color: white;
-      font-family: Arial, sans-serif;
-    }
-    .box {
-      width: 90%;
-      max-width: 380px;
-      padding: 30px;
-      box-sizing: border-box;
-      background: #222235;
-      border-radius: 18px;
-      text-align: center;
-    }
-    input, button {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 13px;
-      margin-top: 12px;
-      border: 0;
-      border-radius: 10px;
-      font-size: 16px;
-    }
-    button {
-      background: #4169ff;
-      color: white;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    #message { margin-top: 16px; }
-  </style>
+  
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f2f6ff;
+  font-family: Arial, sans-serif;
+  color: #172b4d;
+}
+
+.container {
+  width: 90%;
+  max-width: 420px;
+  padding: 40px 30px;
+  background: #ffffff;
+  border: 2px solid #dce7ff;
+  border-radius: 20px;
+  box-shadow: 0 10px 35px rgba(30, 80, 160, 0.12);
+  text-align: center;
+}
+
+h1 {
+  color: #1769e0;
+  font-size: 34px;
+  margin-bottom: 30px;
+}
+
+input {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  margin: 14px 0;
+  border: 2px solid #d5e2f8;
+  border-radius: 10px;
+  background: #f8faff;
+  color: #172b4d;
+  font-size: 16px;
+  outline: none;
+}
+
+input:focus {
+  border-color: #1769e0;
+}
+
+button {
+  width: 100%;
+  padding: 15px;
+  margin-top: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #1769e0;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: #0d50b5;
+}
+
+#registerBtn {
+  background: #e53945;
+}
+
+#registerBtn:hover {
+  background: #c62835;
+}
+
+#message {
+  margin-top: 18px;
+  font-size: 14px;
+  color: #e53945;
+}
+
 </head>
 <body>
 
