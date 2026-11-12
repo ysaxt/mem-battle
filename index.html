@@ -479,11 +479,11 @@
       voteB.textContent = 'Раунд завершён';
 
       if (row.winner_meme_id === row.meme_a_id) {
-        message.textContent = 'Победил первый мем! +1 победа';
+        message.textContent = 'Победил первый мем!';
       } else if (row.winner_meme_id === row.meme_b_id) {
-        message.textContent = 'Победил второй мем! +1 победа';
+        message.textContent = 'Победил второй мем!';
       } else {
-        message.textContent = 'Ничья! Победителя нет.';
+        message.textContent = 'Ничья!';
       }
 
       message.className = 'result-message';
