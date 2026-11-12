@@ -71,8 +71,9 @@
     }
 
     .subtitle {
-      color: #8290a8;
-      margin-bottom: 24px;
+      color: #77869e;
+      margin-bottom: 25px;
+      line-height: 1.6;
     }
 
     .upload-card {
@@ -80,21 +81,15 @@
       border-radius: 20px;
       padding: 28px;
       box-shadow: 0 5px 22px rgba(30,70,130,.07);
+      max-width: 700px;
     }
 
     .upload-area {
       border: 2px dashed #b8d2f8;
-      background: #f7faff;
       border-radius: 16px;
-      padding: 35px 20px;
+      padding: 30px 20px;
       text-align: center;
-      cursor: pointer;
-      transition: .2s;
-    }
-
-    .upload-area:hover {
-      border-color: #246bdb;
-      background: #eef5ff;
+      background: #f7faff;
     }
 
     .upload-icon {
@@ -102,19 +97,20 @@
       margin-bottom: 12px;
     }
 
-    .upload-title {
-      font-weight: 800;
-      font-size: 17px;
-      margin-bottom: 7px;
+    .upload-area p {
+      color: #77869e;
+      line-height: 1.5;
     }
 
-    .upload-hint {
-      color: #8996aa;
-      font-size: 13px;
-    }
-
-    #fileInput {
-      display: none;
+    input[type="file"] {
+      display: block;
+      width: 100%;
+      margin-top: 18px;
+      padding: 12px;
+      background: white;
+      border: 1px solid #dce6f5;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
     }
 
     .preview {
@@ -128,12 +124,7 @@
       max-height: 350px;
       border-radius: 14px;
       object-fit: contain;
-    }
-
-    .file-name {
-      color: #8290a8;
-      font-size: 13px;
-      margin-top: 10px;
+      background: #edf3fc;
     }
 
     .btn {
@@ -145,39 +136,41 @@
       color: white;
       font-weight: 800;
       cursor: pointer;
-      font-size: 14px;
-      text-decoration: none;
-      transition: .2s;
+      font-size: 15px;
+      width: 100%;
+      margin-top: 20px;
     }
 
     .btn:hover { background: #1558bd; }
-
-    .btn:disabled {
-      opacity: .55;
-      cursor: not-allowed;
-    }
-
-    .submit-btn {
-      width: 100%;
-      margin-top: 22px;
-    }
+    .btn:disabled { opacity: .6; cursor: not-allowed; }
 
     .message {
       margin-top: 18px;
-      font-weight: 700;
-      text-align: center;
+      padding: 13px;
+      border-radius: 10px;
+      display: none;
       line-height: 1.5;
+      font-weight: 600;
     }
 
-    .message.error { color: #e34b4b; }
-    .message.success { color: #15965b; }
+    .message.success {
+      display: block;
+      background: #eafff2;
+      color: #16834d;
+    }
+
+    .message.error {
+      display: block;
+      background: #fff0f0;
+      color: #d83c3c;
+    }
 
     .rules {
-      margin-top: 20px;
-      padding: 17px;
+      margin-top: 22px;
+      padding: 18px;
+      background: #f4f8ff;
       border-radius: 13px;
-      background: #f2f7ff;
-      color: #687991;
+      color: #64738c;
       font-size: 13px;
       line-height: 1.7;
     }
@@ -193,8 +186,10 @@
 
 <body>
   <div class="app">
+
     <header class="header">
       <a href="index.html" class="logo">МЕМ БИТВА</a>
+
       <nav class="nav">
         <a href="index.html">Битвы</a>
         <a href="submit.html" class="active">Отправить мем</a>
@@ -204,152 +199,195 @@
     </header>
 
     <h1 class="page-title">Отправить мем</h1>
-    <p class="subtitle">Загрузи свой мем и попробуй попасть в Мем Битву!</p>
+    <p class="subtitle">
+      Загрузи свой мем и отправь его на модерацию.
+      После одобрения он сможет участвовать в битвах!
+    </p>
 
     <section class="upload-card">
-      <label class="upload-area" for="fileInput">
+      <div class="upload-area">
         <div class="upload-icon">🖼️</div>
-        <div class="upload-title">Нажми, чтобы выбрать изображение</div>
-        <div class="upload-hint">JPG, PNG или WEBP. Максимум 5 МБ.</div>
-      </label>
+        <strong>Выбери изображение для загрузки</strong>
+        <p>Поддерживаются JPG, PNG, WEBP и GIF. Максимальный размер — 10 МБ.</p>
 
-      <input
-        type="file"
-        id="fileInput"
-        accept="image/jpeg,image/png,image/webp"
-      >
-
-      <div class="preview" id="preview">
-        <img id="previewImage" alt="Предпросмотр мема">
-        <div class="file-name" id="fileName"></div>
+        <input
+          type="file"
+          id="memeFile"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+        >
       </div>
 
-      <button class="btn submit-btn" id="submitBtn" disabled>
-        Отправить на проверку
+      <div class="preview" id="preview">
+        <p><strong>Предпросмотр:</strong></p>
+        <img id="previewImage" alt="Предпросмотр мема">
+      </div>
+
+      <button class="btn" id="uploadBtn">
+        Отправить на модерацию
       </button>
 
       <div class="message" id="message"></div>
 
       <div class="rules">
-        **Перед отправкой:**
-        <br>• Максимальный размер изображения — 5 МБ.
-        <br>• Принимаются JPG, PNG и WEBP.
-        <br>• После отправки мем получит статус «На проверке».
-        <br>• Не отправляй чужие личные данные и неподходящие материалы.
+        <strong>Правила загрузки</strong><br>
+        • Загружай только изображения.<br>
+        • Не отправляй чужие личные данные.<br>
+        • После отправки мем получит статус «На проверке».<br>
+        • Публикация в битвах начнётся после одобрения.
       </div>
     </section>
+
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
 
   <script>
-    const fileInput = document.getElementById('fileInput');
+    const fileInput = document.getElementById('memeFile');
     const preview = document.getElementById('preview');
     const previewImage = document.getElementById('previewImage');
-    const fileName = document.getElementById('fileName');
-    const submitBtn = document.getElementById('submitBtn');
+    const uploadBtn = document.getElementById('uploadBtn');
     const message = document.getElementById('message');
 
     let selectedFile = null;
+    let previewUrl = null;
 
     function showMessage(text, type) {
       message.textContent = text;
-      message.className = 'message ' + (type || '');
+      message.className = 'message ' + type;
     }
 
     fileInput.addEventListener('change', () => {
-      const file = fileInput.files[0];
+      selectedFile = fileInput.files[0] || null;
+      message.className = 'message';
 
-      selectedFile = null;
-      submitBtn.disabled = true;
-      preview.style.display = 'none';
-      showMessage('');
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+        previewUrl = null;
+      }
 
-      if (!file) return;
-
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-
-      if (!allowedTypes.includes(file.type)) {
-        showMessage('Выбери изображение JPG, PNG или WEBP.', 'error');
-        fileInput.value = '';
+      if (!selectedFile) {
+        preview.style.display = 'none';
         return;
       }
 
-      if (file.size > 5 * 1024 * 1024) {
-        showMessage('Файл слишком большой. Максимум 5 МБ.', 'error');
+      const allowedTypes = [
+        'image/jpeg',
+        'image/png',
+        'image/webp',
+        'image/gif'
+      ];
+
+      if (!allowedTypes.includes(selectedFile.type)) {
+        selectedFile = null;
         fileInput.value = '';
+        preview.style.display = 'none';
+        showMessage('Выбери JPG, PNG, WEBP или GIF.', 'error');
         return;
       }
 
-      selectedFile = file;
-      previewImage.src = URL.createObjectURL(file);
-      fileName.textContent = file.name;
+      if (selectedFile.size > 10 * 1024 * 1024) {
+        selectedFile = null;
+        fileInput.value = '';
+        preview.style.display = 'none';
+        showMessage('Файл слишком большой. Максимум — 10 МБ.', 'error');
+        return;
+      }
+
+      previewUrl = URL.createObjectURL(selectedFile);
+      previewImage.src = previewUrl;
       preview.style.display = 'block';
-      submitBtn.disabled = false;
     });
 
-    submitBtn.addEventListener('click', async () => {
-      if (!selectedFile) return;
+    uploadBtn.addEventListener('click', async () => {
+      message.className = 'message';
 
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Отправляем...';
-      showMessage('');
+      if (!selectedFile) {
+        showMessage('Сначала выбери изображение.', 'error');
+        return;
+      }
+
+      uploadBtn.disabled = true;
+      uploadBtn.textContent = 'Загрузка...';
 
       try {
-        const { data: { user }, error: authError } =
+        const { data: authData, error: authError } =
           await supabaseClient.auth.getUser();
 
-        if (authError || !user) {
-          throw new Error('Сначала, войди в аккаунт.');
+        if (authError || !authData.user) {
+          showMessage('Сначала войди в свой аккаунт.', 'error');
+          return;
         }
 
-        const extension = selectedFile.name.split('.').pop().toLowerCase();
-        const filePath = user.id + '/' + crypto.randomUUID() + '.' + extension;
+        const user = authData.user;
 
-        const { error: uploadError } = await supabaseClient.storage
+        const extensions = {
+          'image/jpeg': 'jpg',
+          'image/png': 'png',
+          'image/webp': 'webp',
+          'image/gif': 'gif'
+        };
+
+        const extension = extensions[selectedFile.type];
+        const filePath =
+          user.id + '/' + crypto.randomUUID() + '.' + extension;
+
+        // Загружаем изображение в Storage
+        const { error: uploadError } = await supabaseClient
+          .storage
           .from('memes')
           .upload(filePath, selectedFile, {
-            cacheControl: '3600',
-            upsert: false,
-            contentType: selectedFile.type
+            contentType: selectedFile.type,
+            upsert: false
           });
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          throw uploadError;
+        }
 
-        const { data: publicData } = supabaseClient.storage
+        // Получаем публичную ссылку на изображение
+        const { data: publicData } = supabaseClient
+          .storage
           .from('memes')
           .getPublicUrl(filePath);
 
         const imageUrl = publicData.publicUrl;
 
+        // Добавляем мем в базу. Статус берётся из default: pending.
         const { error: insertError } = await supabaseClient
           .from('memes')
           .insert({
             user_id: user.id,
-            image_url: imageUrl,
-            status: 'pending',
-            wins: 0
+            image_url: imageUrl
           });
 
         if (insertError) {
-          throw new Error(
-            'Изображение загрузилось, но запись не сохранилась: ' +
-            insertError.message
-          );
+          throw insertError;
         }
 
-        showMessage('Мем успешно отправлен на проверку!', 'success');
+        showMessage(
+          'Мем успешно отправлен! Он появится в битвах после модерации.',
+          'success'
+        );
 
-        selectedFile = null;
         fileInput.value = '';
+        selectedFile = null;
         preview.style.display = 'none';
-        submitBtn.disabled = true;
+
+        if (previewUrl) {
+          URL.revokeObjectURL(previewUrl);
+          previewUrl = null;
+        }
+
       } catch (error) {
-        showMessage(error.message || 'Произошла ошибка при отправке.', 'error');
-        submitBtn.disabled = !selectedFile;
+        console.error('Ошибка загрузки:', error);
+        showMessage(
+          'Не удалось отправить мем: ' + (error.message || 'неизвестная ошибка'),
+          'error'
+        );
       } finally {
-        submitBtn.textContent = 'Отправить на проверку';
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = 'Отправить на модерацию';
       }
     });
   </script>
