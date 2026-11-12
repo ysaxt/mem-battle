@@ -1,0 +1,81 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мембатл — битва мемов</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header class="header">
+        <a href="index.html" class="logo">MEM<span>BATTLE</span></a>
+
+        <nav class="nav">
+            <a href="index.html">Батлы</a>
+            <a href="#">Рейтинг</a>
+            <a href="#">Профиль</a>
+        </nav>
+
+        <div class="user-info">
+            <span>🪙 1000</span>
+            <a href="#" class="login-button">Войти</a>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <section class="hero">
+            <p class="eyebrow">АРЕНА МЕМОВ</p>
+            <h1>КТО СМЕШНЕЕ?</h1>
+            <p>Выбирай любимые мемы, участвуй в батлах
+                и зарабатывай игровые коины.</p>
+        </section>
+
+        <section class="battle-section">
+            <div class="section-heading">
+                <div>
+                    <h2>Текущий батл</h2>
+                    <p>Выбери победителя</p>
+                </div>
+                <div class="timer" id="timer">00:30</div>
+            </div>
+
+            <div class="battle-arena">
+
+                <button class="meme-card" id="meme1">
+                    <div class="meme-image">
+                        <span>МЕМ 1</span>
+                    </div>
+                    <h3>Первый мем</h3>
+                    <span class="vote-label">ГОЛОСОВАТЬ</span>
+                </button>
+
+                <div class="versus">VS</div>
+
+                <button class="meme-card" id="meme2">
+                    <div class="meme-image second">
+                        <span>МЕМ 2</span>
+                    </div>
+                    <h3>Второй мем</h3>
+                    <span class="vote-label">ГОЛОСОВАТЬ</span>
+                </button>
+
+            </div>
+
+            <div class="battle-footer">
+                <span>🪙 Твои коины: <b id="coins">1000</b></span>
+                <span id="battle-status">Выбери мем</span>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        MEMBATTLE 2.0 — БИТВА МЕМОВ
+    </footer>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
