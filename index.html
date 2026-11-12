@@ -517,6 +517,7 @@
     const completed = row.battle_status === 'completed';
     const myVote = row.my_vote;
     const voting = votingBattles.has(row.battle_id);
+    card.dataset.endsAt = row.ends_at;
 
     const imageA = card.querySelector('.image-a');
     const imageB = card.querySelector('.image-b');
