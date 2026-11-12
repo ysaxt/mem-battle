@@ -271,9 +271,7 @@
       font-weight: 800;
     }
 
-    .vs {
-      display: none;
-    }
+    .vs { display: none; }
 
     .battle-status {
       margin-top: 13px;
@@ -302,13 +300,8 @@
     }
 
     @media (max-width: 850px) {
-      .battles-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .meme-card img {
-        height: 230px;
-      }
+      .battles-grid { grid-template-columns: 1fr; }
+      .meme-card img { height: 230px; }
     }
 
     @media (max-width: 550px) {
@@ -332,15 +325,10 @@
       }
 
       .battle-heading h1 { font-size: 28px; }
-
       .category-header h2 { font-size: 19px; }
-
       .battle-card { padding: 10px; }
-
       .battle-pair { gap: 7px; }
-
       .meme-card { padding: 6px; }
-
       .meme-card img { height: 145px; }
 
       .vote-button {
@@ -383,7 +371,6 @@
   </div>
 
   <div id="message">Подключаемся к батлам...</div>
-
   <div id="categories"></div>
 </main>
 
@@ -517,6 +504,7 @@
     const completed = row.battle_status === 'completed';
     const myVote = row.my_vote;
     const voting = votingBattles.has(row.battle_id);
+
     card.dataset.endsAt = row.ends_at;
 
     const imageA = card.querySelector('.image-a');
@@ -537,6 +525,7 @@
       'Голосов: ' + (row.votes_b || 0);
 
     const timer = card.querySelector('.battle-timer');
+
     timer.textContent = completed
       ? 'Результат'
       : formatTime(secondsLeft);
@@ -775,10 +764,12 @@
     setInterval(refreshBattles, 1000);
 
     setInterval(() => {
-      battleElements.forEach((card, battleId) => {
+      battleElements.forEach((card) => {
         const timer = card.querySelector('.battle-timer');
 
-        // Таймер обновляется локально между запросами к базе.
+        // Не перезаписываем результат завершённого батла.
+        if (timer.textContent === 'Результат') return;
+
         const endTime = card.dataset.endsAt;
 
         if (endTime) {
