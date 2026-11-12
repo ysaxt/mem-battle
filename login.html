@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Вход / Регистрация — Мем Битва</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app" style="max-width:500px; margin:0 auto;">
+  <div class="logo" style="text-align:center; margin-bottom:30px;">
+    <h1>⚡ Мем Битва</h1>
+    <span>вход / регистрация</span>
+  </div>
+
+  <div class="profile-card" style="max-width:100%;">
+    <h2 id="formTitle">Вход</h2>
+
+    <input
+      type="text"
+      id="loginInput"
+      placeholder="Ник"
+      autocomplete="username"
+      maxlength="20"
+      style="width:100%; padding:10px; border-radius:40px; border:1px solid #2a2a5a; background:#222; color:#fff; margin-bottom:12px; outline:none;"
+    >
+
+    <input
+      type="password"
+      id="passwordInput"
+      placeholder="Пароль"
+      autocomplete="current-password"
+      style="width:100%; padding:10px; border-radius:40px; border:1px solid #2a2a5a; background:#222; color:#fff; margin-bottom:12px; outline:none;"
+    >
+
+    <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
+      <button id="loginBtn"
+        style="background:#3366ff; border:none; padding:10px 30px; border-radius:40px; font-weight:700; color:#fff; cursor:pointer;">
+        Войти
+      </button>
+
+      <button id="registerBtn"
+        style="background:#22aa44; border:none; padding:10px 30px; border-radius:40px; font-weight:700; color:#fff; cursor:pointer;">
+        Зарегистрироваться
+      </button>
+    </div>
+
+    <div id="loginMessage"
+      style="margin-top:16px; text-align:center; color:#ff6666;">
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+
+<script>
+(async () => {
+  const loginInput = document.getElementById('loginInput');
+  const passwordInput = document.getElementById('passwordInput');
+  const message = document.getElementById('loginMessage');
+  const loginBtn = document.getElementById('loginBtn');
+  const registerBtn = document.getElementById('registerBtn');
+
+  function showMessage(text, success = false) {
+    message.textContent = text;
+    message.style.color = success ? '#88ff88' : '#ff6666';
+  }
+
+  function getUsername() {
+    return loginInput.value.trim().toLowerCase();
+  }
+
+  function getEmail(username) {
+    return username + '@membattle.example';
+  }
+
+  if (typeof supabaseClient === 'undefined') {
+    showMessage('Ошибка подключения Supabase. Проверь supabase.js');
+    return;
+  }
+
+  const { data, error } = await supabaseClient.auth.getSession();
+
+  if (error) {
+    showMessage(error.message);
+    return;
+  }
+
+  if (data.session) {
+    location.href = 'index.html';
+    return;
+  }
+
+  function validate() {
+    const username = getUsername();
+    const password = passwordInput.value;
+
+    if (!/^[a-z0-9_]{3,20}$/.test(username)) {
+      showMessage('Ник: 3–20 символов, только английские буквы, цифры и _');
+      return false;
+    }
+
+    if (password.length < 6) {
+      showMessage('Пароль должен содержать минимум 6 символов');
+      return false;
+    }
+
+    return true;
+  }
+
+  loginBtn.addEventListener('click', async () => {
+    if (!validate()) return;
+
+    loginBtn.disabled = true;
+    registerBtn.disabled = true;
+
+    const username = getUsername();
+
+    const { error } = await supabaseClient.auth.signInWithPassword({
+      email: getEmail(username),
+      password: passwordInput.value
+    });
+
+    loginBtn.disabled = false;
+    registerBtn.disabled = false;
+
+    if (error) {
+      showMessage('Не удалось войти. Проверь ник и пароль.');
+      return;
+    }
+
+    showMessage('Вход выполнен!', true);
+    location.href = 'index.html';
+  });
+
+  registerBtn.addEventListener('click', async () => {
+    if (!validate()) return;
+
+    loginBtn.disabled = true;
+    registerBtn.disabled = true;
+
+    const username = getUsername();
+
+    const { data, error } = await supabaseClient.auth.signUp({
+      email: getEmail(username),
+      password: passwordInput.value,
+      options: {
+        data: {
+          username: username
+        }
+      }
+    });
+
+    loginBtn.disabled = false;
+    registerBtn.disabled = false;
+
+    if (error) {
+      showMessage(
+        error.message.includes('already registered')
+          ? 'Этот ник уже занят.'
+          : 'Ошибка регистрации: ' + error.message
+      );
+      return;
+    }
+
+    if (data.session) {
+      showMessage('Аккаунт создан!', true);
+      location.href = 'index.html';
+    } else {
+      showMessage('Аккаунт создан, но сессия не получена. Проверь настройки Supabase.');
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
