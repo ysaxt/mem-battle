@@ -5,48 +5,35 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Мем Битва</title>
-  <style>
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: #111;
-      color: white;
-      font-family: Arial, sans-serif;
-    }
-    h1 { font-size: 64px; }
-    button {
-      display: block;
-      margin: 30px auto;
-      padding: 12px 25px;
-      cursor: pointer;
-    }
-  </style>
 </head>
-<body>
-  <div id="content">ПРОВЕРКА...</div>
+<body style="background:#111;color:white;font-family:Arial;text-align:center;padding-top:20vh">
+  <h1 id="status">ПРОВЕРКА...</h1>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
   <script>
-    (async () => {
-      const { data, error } = await supabaseClient.auth.getSession();
+    async function checkLogin() {
+      try {
+        if (typeof supabaseClient === 'undefined') {
+          throw new Error('Не удалось подключить supabase.js');
+        }
 
-      if (error || !data.session) {
-        location.replace('login.html');
-        return;
+        const { data, error } = await supabaseClient.auth.getSession();
+
+        if (error) throw error;
+
+        if (data.session) {
+          document.getElementById('status').textContent = 'УСПЕШНО';
+        } else {
+          location.replace('./login.html');
+        }
+      } catch (error) {
+        document.getElementById('status').textContent =
+          'ОШИБКА: ' + error.message;
       }
+    }
 
-      document.getElementById('content').innerHTML =
-        '<h1>УСПЕШНО</h1><button id="logout">Выйти</button>';
-
-      document.getElementById('logout').onclick = async () => {
-        await supabaseClient.auth.signOut();
-        location.replace('login.html');
-      };
-    })();
+    checkLogin();
   </script>
 </body>
 </html>
