@@ -4,167 +4,246 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Мем Битва — Загрузить мем</title>
+  <title>Mem Battle — Отправить мем</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; }
 
     body {
-      font-family: Arial, sans-serif;
-      background: #f4f6fb;
-      color: #20243a;
+      margin: 0;
+      min-height: 100vh;
+      background: #f2f6ff;
+      font-family: 'Inter', Arial, sans-serif;
+      color: #172b4d;
     }
 
     header {
+      min-height: 105px;
       background: white;
-      border-bottom: 1px solid #e8eaf2;
-      padding: 16px 5%;
+      border-bottom: 2px solid #dce7ff;
+      padding: 20px 5%;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
+      gap: 25px;
       flex-wrap: wrap;
-      gap: 15px;
+    }
+
+    .left-side {
+      display: flex;
+      flex-direction: column;
     }
 
     .logo {
-      font-size: 24px;
-      font-weight: 900;
-      color: #6257e8;
+      font-family: 'Russo One', sans-serif;
+      font-size: 32px;
       text-decoration: none;
+      color: #1769e0;
+      letter-spacing: 1px;
     }
 
-    nav {
+    .logo span { color: #e53945; }
+
+    .navigation {
       display: flex;
-      gap: 20px;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 15px;
+    }
+
+    .navigation a {
+      text-decoration: none;
+      color: #31517e;
+      background: #f2f6ff;
+      padding: 11px 17px;
+      border-radius: 9px;
+      font-weight: 700;
+      font-size: 14px;
+      transition: 0.2s;
+    }
+
+    .navigation a:hover,
+    .navigation a.active {
+      background: #1769e0;
+      color: white;
+    }
+
+    .right-side {
+      display: flex;
+      align-items: center;
+      gap: 18px;
       flex-wrap: wrap;
     }
 
-    nav a {
-      text-decoration: none;
-      color: #62677a;
-      font-weight: 600;
+    .user-info { text-align: right; }
+
+    .username {
+      font-weight: 800;
+      font-size: 16px;
+      color: #1769e0;
     }
 
-    nav a.active,
-    nav a:hover {
-      color: #6257e8;
+    .balance {
+      margin-top: 5px;
+      font-size: 14px;
+      color: #71809b;
     }
 
-    .container {
-      max-width: 650px;
-      margin: 45px auto;
-      padding: 0 20px;
+    .balance span {
+      color: #e53945;
+      font-weight: 800;
     }
 
-    .card {
+    .logout {
+      border: none;
+      background: #e53945;
+      color: white;
+      padding: 12px 19px;
+      border-radius: 9px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .logout:hover { background: #c62835; }
+
+    main {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 25px;
+    }
+
+    .page-heading {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .page-heading h1 {
+      font-family: 'Russo One', sans-serif;
+      color: #1769e0;
+      font-size: 34px;
+      margin: 0 0 10px;
+    }
+
+    .page-heading h1 span { color: #e53945; }
+
+    .page-heading p {
+      color: #71809b;
+      margin: 0;
+    }
+
+    .upload-card {
       background: white;
-      padding: 30px;
-      border-radius: 18px;
-      box-shadow: 0 4px 20px rgba(30, 35, 70, 0.05);
+      border: 2px solid #dce7ff;
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 7px 25px rgba(30, 80, 160, 0.06);
     }
 
-    h1 {
-      font-size: 28px;
-      margin-bottom: 12px;
-    }
-
-    .description {
-      color: #777;
-      line-height: 1.5;
-      margin-bottom: 25px;
+    .user-label {
+      color: #1769e0;
+      font-weight: 800;
+      margin-bottom: 22px;
     }
 
     .upload-area {
-      border: 2px dashed #c9c5f7;
-      background: #fafaff;
-      padding: 35px 20px;
-      border-radius: 15px;
+      border: 2px dashed #b9cfee;
+      background: #f8faff;
+      border-radius: 13px;
+      padding: 38px 20px;
       text-align: center;
-      margin-bottom: 20px;
+    }
+
+    .upload-area h2 {
+      font-size: 19px;
+      margin: 0 0 10px;
+      color: #31517e;
     }
 
     .upload-area p {
-      color: #777;
-      margin-bottom: 15px;
+      color: #71809b;
+      font-size: 13px;
+      margin: 0 0 20px;
     }
 
     input[type="file"] {
       max-width: 100%;
+      color: #31517e;
     }
 
     .preview {
       display: none;
-      margin: 20px 0;
+      margin-top: 22px;
       text-align: center;
     }
 
     .preview img {
       max-width: 100%;
-      max-height: 300px;
+      max-height: 350px;
+      object-fit: contain;
       border-radius: 12px;
+      background: #f2f6ff;
     }
 
-    .button {
+    .upload-button {
       width: 100%;
-      background: #6257e8;
-      color: white;
-      border: none;
+      margin-top: 22px;
       padding: 15px;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: 700;
+      border: none;
+      border-radius: 9px;
+      background: #1769e0;
+      color: white;
+      font-size: 15px;
+      font-weight: 800;
       cursor: pointer;
+      transition: 0.2s;
     }
 
-    .button:hover {
-      background: #5146d3;
+    .upload-button:hover:not(:disabled) {
+      background: #0d50b5;
     }
 
-    .button:disabled {
-      opacity: 0.6;
+    .upload-button:disabled {
+      opacity: 0.55;
       cursor: not-allowed;
     }
 
     #message {
-      margin-top: 18px;
-      line-height: 1.5;
       text-align: center;
+      margin-top: 18px;
+      font-size: 14px;
+      line-height: 1.6;
     }
 
-    .success {
-      color: #24864a;
-    }
+    .success { color: #168653; }
+    .error { color: #e53945; }
 
-    .error {
-      color: #d04444;
-    }
+    @media (max-width: 550px) {
+      header { align-items: flex-start; }
 
-    .user-info {
-      color: #6257e8;
-      font-weight: 700;
-      margin-bottom: 20px;
-    }
-
-    @media (max-width: 600px) {
-      header {
-        padding: 15px 20px;
+      .right-side {
+        width: 100%;
+        justify-content: space-between;
       }
 
-      nav {
-        gap: 12px;
+      .navigation { gap: 7px; }
+
+      .navigation a {
+        padding: 9px 10px;
+        font-size: 12px;
       }
 
-      .card {
-        padding: 22px;
+      main {
+        padding: 0 12px;
+        margin-top: 28px;
       }
 
-      h1 {
-        font-size: 24px;
-      }
+      .page-heading h1 { font-size: 27px; }
+      .upload-card { padding: 15px; }
+      .upload-area { padding: 28px 12px; }
     }
   </style>
 </head>
@@ -172,34 +251,45 @@
 <body>
 
 <header>
-  <a href="index.html" class="logo">MEM BATTLE</a>
+  <div class="left-side">
+    <a href="index.html" class="logo">MEM <span>BATTLE</span></a>
 
-  <nav>
-    <a href="index.html">Батлы</a>
-    <a href="submit.html" class="active">Загрузить мем</a>
-    <a href="profile.html">Профиль</a>
-    <a href="#" id="logoutLink">Выйти</a>
-  </nav>
+    <nav class="navigation">
+      <a href="index.html">Главная</a>
+      <a href="profile.html">Профиль</a>
+      <a href="submit.html" class="active">Отправить мем</a>
+      <a href="top.html">Топ</a>
+    </nav>
+  </div>
+
+  <div class="right-side">
+    <div class="user-info">
+      <div class="username" id="username">Загрузка...</div>
+      <div class="balance">Баланс: <span id="balance">...</span></div>
+    </div>
+    <button class="logout" id="logoutBtn">Выйти</button>
+  </div>
 </header>
 
-<main class="container">
+<main>
 
-  <section class="card">
-    <h1>Загрузить мем</h1>
+  <div class="page-heading">
+    <h1>ОТПРАВИТЬ <span>МЕМ</span></h1>
+    <p>Загрузи свой мем и отправь его на модерацию!</p>
+  </div>
 
-    <p class="description">
-      Загрузи свой мем, чтобы он мог попасть в битву с другими мемами.
-      После загрузки он отправится на модерацию.
-    </p>
+  <section class="upload-card">
 
-    <div class="user-info" id="userInfo">
-      Проверка аккаунта...
+    <div class="user-label" id="userLabel">
+      Проверяем аккаунт...
     </div>
 
     <form id="uploadForm">
 
       <div class="upload-area">
-        <p>Выбери изображение для загрузки</p>
+        <h2>Выбери свой мем</h2>
+        <p>Поддерживаются JPG, PNG, WEBP и GIF. Максимум 10 МБ.</p>
+
         <input
           type="file"
           id="memeFile"
@@ -212,13 +302,14 @@
         <img id="previewImage" alt="Предпросмотр мема">
       </div>
 
-      <button type="submit" class="button" id="uploadButton">
-        Загрузить мем
+      <button type="submit" class="upload-button" id="uploadButton">
+        ОТПРАВИТЬ МЕМ
       </button>
 
     </form>
 
     <div id="message"></div>
+
   </section>
 
 </main>
@@ -228,138 +319,130 @@
 
 <script>
   const db = supabaseClient;
-
   let currentUser = null;
 
   async function initPage() {
-    const message = document.getElementById("message");
-
     try {
-      if (typeof supabaseClient === "undefined") {
-        throw new Error("Не найден клиент Supabase. Проверь supabase.js");
-      }
-
       const { data, error } = await db.auth.getUser();
 
       if (error || !data.user) {
-        window.location.href = "login.html";
+        location.replace('login.html');
         return;
       }
 
       currentUser = data.user;
 
       const { data: profile, error: profileError } = await db
-        .from("profiles")
-        .select("username, coins")
-        .eq("id", currentUser.id)
+        .from('profiles')
+        .select('username, coins')
+        .eq('id', currentUser.id)
         .single();
 
       if (profileError) throw profileError;
 
-      document.getElementById("userInfo").textContent =
-        (profile.username || "Игрок") +
-        " · Монеты: " + (profile.coins ?? 0);
+      document.getElementById('username').textContent =
+        profile.username || 'Игрок';
+
+      document.getElementById('balance').textContent =
+        Number(profile.coins || 0).toLocaleString('ru-RU');
+
+      document.getElementById('userLabel').textContent =
+        'Ты вошёл как ' + (profile.username || 'Игрок');
 
     } catch (error) {
       console.error(error);
-      message.className = "error";
-      message.textContent = error.message;
+      showMessage('Ошибка: ' + error.message, 'error');
     }
   }
 
-  document.getElementById("memeFile").addEventListener("change", function () {
+  function showMessage(text, type) {
+    const message = document.getElementById('message');
+    message.textContent = text;
+    message.className = type;
+  }
+
+  document.getElementById('memeFile').addEventListener('change', function() {
     const file = this.files[0];
-    const preview = document.getElementById("preview");
-    const previewImage = document.getElementById("previewImage");
+    const preview = document.getElementById('preview');
+    const previewImage = document.getElementById('previewImage');
 
     if (!file) {
-      preview.style.display = "none";
+      preview.style.display = 'none';
       return;
     }
 
     const allowedTypes = [
-      "image/jpeg",
-      "image/png",
-      "image/webp",
-      "image/gif"
+      'image/jpeg',
+      'image/png',
+      'image/webp',
+      'image/gif'
     ];
 
     if (!allowedTypes.includes(file.type)) {
-      alert("Можно загружать только JPG, PNG, WEBP и GIF.");
-      this.value = "";
-      preview.style.display = "none";
+      alert('Можно загружать только JPG, PNG, WEBP и GIF.');
+      this.value = '';
+      preview.style.display = 'none';
       return;
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      alert("Максимальный размер файла — 10 МБ.");
-      this.value = "";
-      preview.style.display = "none";
+      alert('Максимальный размер файла — 10 МБ.');
+      this.value = '';
+      preview.style.display = 'none';
       return;
     }
 
     previewImage.src = URL.createObjectURL(file);
-    preview.style.display = "block";
+    preview.style.display = 'block';
   });
 
-  document.getElementById("uploadForm").addEventListener("submit", async function (e) {
+  document.getElementById('uploadForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
-    const fileInput = document.getElementById("memeFile");
-    const button = document.getElementById("uploadButton");
-    const message = document.getElementById("message");
-
+    const fileInput = document.getElementById('memeFile');
+    const button = document.getElementById('uploadButton');
     const file = fileInput.files[0];
 
-    message.textContent = "";
-    message.className = "";
-
     if (!currentUser) {
-      message.className = "error";
-      message.textContent = "Необходимо войти в аккаунт.";
+      showMessage('Необходимо войти в аккаунт.', 'error');
       return;
     }
 
     if (!file) {
-      message.className = "error";
-      message.textContent = "Сначала выбери изображение.";
+      showMessage('Сначала выбери изображение.', 'error');
       return;
     }
 
     const allowedTypes = [
-      "image/jpeg",
-      "image/png",
-      "image/webp",
-      "image/gif"
+      'image/jpeg',
+      'image/png',
+      'image/webp',
+      'image/gif'
     ];
 
     if (!allowedTypes.includes(file.type)) {
-      message.className = "error";
-      message.textContent = "Неподдерживаемый формат изображения.";
+      showMessage('Неподдерживаемый формат изображения.', 'error');
       return;
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      message.className = "error";
-      message.textContent = "Максимальный размер файла — 10 МБ.";
+      showMessage('Максимальный размер файла — 10 МБ.', 'error');
       return;
     }
 
     button.disabled = true;
-    button.textContent = "Загрузка...";
+    button.textContent = 'ЗАГРУЗКА...';
 
     try {
-      const extension = file.name.split(".").pop().toLowerCase();
-      const filePath =
-        currentUser.id + "/" +
-        crypto.randomUUID() + "." +
-        extension;
+      const extension = file.name.split('.').pop().toLowerCase();
+      const filePath = currentUser.id + '/' +
+        crypto.randomUUID() + '.' + extension;
 
       const { error: uploadError } = await db
         .storage
-        .from("memes")
+        .from('memes')
         .upload(filePath, file, {
-          cacheControl: "3600",
+          cacheControl: '3600',
           upsert: false,
           contentType: file.type
         });
@@ -368,44 +451,45 @@
 
       const { data: publicData } = db
         .storage
-        .from("memes")
+        .from('memes')
         .getPublicUrl(filePath);
 
-      const imageUrl = publicData.publicUrl;
-
       const { error: insertError } = await db
-        .from("memes")
+        .from('memes')
         .insert({
           user_id: currentUser.id,
-          image_url: imageUrl
+          image_url: publicData.publicUrl
         });
 
       if (insertError) throw insertError;
 
-      message.className = "success";
-      message.textContent =
-        "Мем успешно загружен! Он отправлен на модерацию.";
+      showMessage(
+        'Мем успешно отправлен! Он ожидает модерации.',
+        'success'
+      );
 
-      fileInput.value = "";
-      document.getElementById("preview").style.display = "none";
+      fileInput.value = '';
+      document.getElementById('preview').style.display = 'none';
 
     } catch (error) {
       console.error(error);
-
-      message.className = "error";
-      message.textContent = "Ошибка загрузки: " + error.message;
+      showMessage('Ошибка загрузки: ' + error.message, 'error');
 
     } finally {
       button.disabled = false;
-      button.textContent = "Загрузить мем";
+      button.textContent = 'ОТПРАВИТЬ МЕМ';
     }
   });
 
-  document.getElementById("logoutLink").addEventListener("click", async function (e) {
-    e.preventDefault();
+  document.getElementById('logoutBtn').addEventListener('click', async function() {
+    const { error } = await db.auth.signOut();
 
-    await db.auth.signOut();
-    window.location.href = "login.html";
+    if (error) {
+      alert('Ошибка выхода: ' + error.message);
+      return;
+    }
+
+    location.replace('login.html');
   });
 
   initPage();
