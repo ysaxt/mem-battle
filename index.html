@@ -4,42 +4,39 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Мем Битва — Батлы</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Мем Битва</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #151522;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    h1 {
+      font-size: clamp(48px, 12vw, 100px);
+      text-align: center;
+    }
+    button {
+      display: block;
+      margin: 30px auto;
+      padding: 12px 28px;
+      border: 0;
+      border-radius: 10px;
+      background: #cc3333;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
 
-<div class="app">
-  <header class="header">
-    <div class="logo">
-      <h1>⚡ Мем Битва</h1>
-    </div>
-    <div style="display:flex; align-items:center; gap:12px;">
-      <div class="balance-box" id="headerBalance">🪙 —</div>
-<button
-  id="logoutBtn"
-  type="button"
-  onclick="supabaseClient.auth.signOut().then(() => location.replace('login.html'))"
-  style="background:#cc3333; border:none; padding:6px 16px; border-radius:40px; font-weight:700; color:#fff; cursor:pointer; position:relative; z-index:10;"
->
-  Выйти
-</button>
-    </div>
-  </header>
-
-  <div class="tabs">
-    <a href="index.html" class="tab-btn active">🏆 Битвы</a>
-    <a href="profile.html" class="tab-btn">👤 Профиль</a>
-    <a href="top.html" class="tab-btn">📊 Топ</a>
-    <a href="submit.html" class="tab-btn">📤 Отправить мем</a>
-    <a href="admin.html" class="tab-btn" id="adminTab" style="display:none;">🛡️ Админ</a>
-  </div>
-
-  <div class="tab-content active">
-    <div id="battlesContainer" class="battles-list">
-      <div class="info-text">Загрузка батла...</div>
-    </div>
-  </div>
+<div>
+  <h1>УСПЕШНО</h1>
+  <button id="logoutBtn">Выйти</button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -47,300 +44,23 @@
 
 <script>
 (async () => {
-  const container = document.getElementById('battlesContainer');
-  const balanceElement = document.getElementById('headerBalance');
-  const logoutBtn = document.getElementById('logoutBtn');
+  const { data, error } = await supabaseClient.auth.getSession();
 
-  let currentUser = null;
-  let currentBattle = null;
-  let timer = null;
-  let hasBet = false;
-
-  function showError(message) {
-    container.innerHTML = '';
-    const box = document.createElement('div');
-    box.className = 'info-text';
-    box.style.color = '#ff6666';
-    box.textContent = message;
-    container.appendChild(box);
+  if (error || !data.session) {
+    location.replace('login.html');
+    return;
   }
 
-  function showMessage(message) {
-    const box = document.getElementById('betMessage');
-    if (box) box.textContent = message;
-  }
-
-  function formatCoins(value) {
-    return Number(value).toLocaleString('ru-RU');
-  }
-
-  function createElement(tag, className, text) {
-    const element = document.createElement(tag);
-    if (className) element.className = className;
-    if (text !== undefined) element.textContent = text;
-    return element;
-  }
-
-  // Проверка авторизации
-const { data: sessionData, error: sessionError } =
-  await supabaseClient.auth.getSession();
-
-if (sessionError || !sessionData.session) {
-  location.replace('login.html');
-  return;
-}
-  currentUser = sessionData.session.user;
-
-  // Выход
-  logoutBtn.addEventListener('click', async () => {
-  logoutBtn.disabled = true;
-  logoutBtn.textContent = 'Выход...';
-
-  try {
+  document.getElementById('logoutBtn').onclick = async () => {
     const { error } = await supabaseClient.auth.signOut();
 
-    if (error) throw error;
-
-    location.replace('login.html');
-  } catch (error) {
-    alert('Ошибка выхода: ' + error.message);
-    logoutBtn.disabled = false;
-    logoutBtn.textContent = 'Выйти';
-  }
-});
-  // Загрузка профиля
-  async function loadProfile() {
-    const { data, error } = await supabaseClient
-      .from('profiles')
-      .select('username, coins, role')
-      .eq('id', currentUser.id)
-      .single();
-
-    if (error) throw error;
-
-    balanceElement.textContent = '🪙 ' + formatCoins(data.coins);
-
-    if (data.role === 'admin') {
-      document.getElementById('adminTab').style.display = '';
-    }
-
-    return data;
-  }
-
-  // Поиск активного батла
-  async function loadBattle() {
-    const { data: battles, error } = await supabaseClient
-      .from('battles')
-      .select('id, meme_a, meme_b, starts_at, ends_at, status')
-      .eq('status', 'active')
-      .gt('ends_at', new Date().toISOString())
-      .order('ends_at', { ascending: true })
-      .limit(1);
-
-    if (error) throw error;
-
-    if (!battles || battles.length === 0) {
-      container.innerHTML =
-        '<div class="info-text">Сейчас активных батлов нет. Загляни немного позже!</div>';
+    if (error) {
+      alert(error.message);
       return;
     }
 
-    currentBattle = battles[0];
-
-    // Загружаем оба мема
-    const { data: memes, error: memesError } = await supabaseClient
-      .from('memes')
-      .select('id, image_url, wins')
-      .in('id', [currentBattle.meme_a, currentBattle.meme_b]);
-
-    if (memesError) throw memesError;
-
-    const memeA = memes.find(m => m.id === currentBattle.meme_a);
-    const memeB = memes.find(m => m.id === currentBattle.meme_b);
-
-    if (!memeA || !memeB) {
-      throw new Error('Не удалось загрузить мемы батла');
-    }
-
-    // Проверяем, делал ли пользователь ставку
-    const { data: existingBet, error: betError } = await supabaseClient
-      .from('bets')
-      .select('id, meme_id, amount')
-      .eq('battle_id', currentBattle.id)
-      .eq('user_id', currentUser.id)
-      .maybeSingle();
-
-    if (betError) throw betError;
-
-    hasBet = !!existingBet;
-
-    renderBattle(memeA, memeB, existingBet);
-  }
-
-  function renderBattle(a, b, existingBet) {
-    container.innerHTML = '';
-
-    const card = createElement('div', 'battle-card');
-
-    const header = createElement('div', 'battle-header');
-    header.appendChild(createElement('div', 'battle-title', '⚔️ Мем-батл'));
-    const timerElement = createElement('div', 'battle-timer', '⏱️ --');
-    timerElement.id = 'battleTimer';
-    header.appendChild(timerElement);
-
-    const memes = createElement('div', 'battle-memes');
-
-    function makeMeme(meme, number) {
-      const button = createElement('button', 'meme-item vote-btn');
-      button.type = 'button';
-      button.disabled = hasBet;
-
-      const image = document.createElement('img');
-      image.src = meme.image_url;
-      image.alt = 'Мем ' + number;
-      image.onerror = () => {
-        image.alt = 'Не удалось загрузить изображение';
-      };
-
-      button.appendChild(image);
-      button.appendChild(createElement('div', 'info-text', '🏆 Побед: ' + meme.wins));
-
-      button.addEventListener('click', () => {
-        document.querySelectorAll('.meme-item').forEach(el => {
-          el.classList.remove('selected');
-        });
-        button.classList.add('selected');
-        document.getElementById('selectedMeme').value = meme.id;
-        showMessage('Выбран мем ' + number);
-      });
-
-      return button;
-    }
-
-    memes.appendChild(makeMeme(a, 1));
-    memes.appendChild(createElement('div', 'vs-small', 'VS'));
-    memes.appendChild(makeMeme(b, 2));
-
-    const betArea = createElement('div', 'battle-bets');
-
-    const betTitle = createElement('h3', '', '🎯 Ваша ставка');
-    betArea.appendChild(betTitle);
-
-    const selectedMeme = document.createElement('input');
-    selectedMeme.type = 'hidden';
-    selectedMeme.id = 'selectedMeme';
-    betArea.appendChild(selectedMeme);
-
-    const amountInput = document.createElement('input');
-    amountInput.type = 'number';
-    amountInput.id = 'betAmount';
-    amountInput.min = '1';
-    amountInput.step = '1';
-    amountInput.placeholder = 'Количество коинов';
-    amountInput.style.cssText =
-      'width:100%;padding:12px;border-radius:30px;margin:10px 0;';
-    betArea.appendChild(amountInput);
-
-    const betButton = createElement('button', 'tab-btn', 'Поставить коины');
-    betButton.type = 'button';
-    betButton.style.cssText =
-      'width:100%;cursor:pointer;background:#3366ff;color:white;border:0;';
-    betArea.appendChild(betButton);
-
-    const message = createElement('div', 'info-text', '');
-    message.id = 'betMessage';
-    betArea.appendChild(message);
-
-    if (existingBet) {
-      const selectedNumber = existingBet.meme_id === a.id ? 1 : 2;
-      message.textContent =
-        'Ваша ставка: ' + formatCoins(existingBet.amount) +
-        ' коинов на мем ' + selectedNumber;
-      amountInput.disabled = true;
-      betButton.disabled = true;
-      document.querySelectorAll('.meme-item').forEach(el => el.disabled = true);
-    }
-
-    betButton.addEventListener('click', async () => {
-      if (hasBet) return;
-
-      const memeId = selectedMeme.value;
-      const amount = Number(amountInput.value);
-
-      if (!memeId) {
-        showMessage('Сначала выбери мем');
-        return;
-      }
-
-      if (!Number.isSafeInteger(amount) || amount <= 0) {
-        showMessage('Введи корректное количество коинов');
-        return;
-      }
-
-      betButton.disabled = true;
-      showMessage('Отправляем ставку...');
-
-      const { data, error } = await supabaseClient.rpc('place_bet', {
-        p_battle_id: currentBattle.id,
-        p_meme_id: memeId,
-        p_amount: amount
-      });
-
-      if (error) {
-        showMessage(error.message);
-        betButton.disabled = false;
-        return;
-      }
-
-      hasBet = true;
-      amountInput.disabled = true;
-      document.querySelectorAll('.meme-item').forEach(el => el.disabled = true);
-
-      showMessage('Ставка принята!');
-
-      balanceElement.textContent =
-        '🪙 ' + formatCoins(data.balance);
-
-      betButton.textContent = 'Ставка сделана';
-    });
-
-    card.appendChild(header);
-    card.appendChild(memes);
-    card.appendChild(betArea);
-
-    container.appendChild(card);
-
-    // Таймер до окончания батла
-    function tick() {
-      const left = Math.max(
-        0,
-        Math.ceil((new Date(currentBattle.ends_at).getTime() - Date.now()) / 1000)
-      );
-
-      timerElement.textContent = '⏱️ ' + left + ' сек.';
-
-      if (left <= 0) {
-        clearInterval(timer);
-        timerElement.textContent = '⏱️ Время вышло';
-        amountInput.disabled = true;
-        betButton.disabled = true;
-        document.querySelectorAll('.meme-item').forEach(el => el.disabled = true);
-        showMessage('Приём ставок завершён. Ожидаем результат.');
-      }
-    }
-
-    clearInterval(timer);
-    tick();
-    timer = setInterval(tick, 1000);
-  }
-
-  try {
-    await loadProfile();
-    await loadBattle();
-  } catch (error) {
-    console.error(error);
-    showError('Ошибка загрузки: ' + error.message);
-  }
+    location.replace('login.html');
+  };
 })();
 </script>
 
