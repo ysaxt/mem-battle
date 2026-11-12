@@ -1,87 +1,103 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Вход / Регистрация — Мем Битва</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Авторизация — Мем Битва</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #151522;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    .box {
+      width: 90%;
+      max-width: 380px;
+      padding: 30px;
+      box-sizing: border-box;
+      background: #222235;
+      border-radius: 18px;
+      text-align: center;
+    }
+    input, button {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 13px;
+      margin-top: 12px;
+      border: 0;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+    button {
+      background: #4169ff;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #message { margin-top: 16px; }
+  </style>
 </head>
 <body>
 
-<div class="app" style="max-width:500px; margin:0 auto;">
-  <div class="logo" style="text-align:center; margin-bottom:30px;">
-    <h1>⚡ Мем Битва</h1>
-    <span>вход / регистрация</span>
-  </div>
+<div class="box">
+  <h1>⚡ Мем Битва</h1>
+  <h2>Регистрация / Вход</h2>
 
-  <div class="profile-card" style="max-width:100%;">
-    <h2 id="formTitle">Вход</h2>
+  <input id="username" placeholder="Ник (3–20 символов)" maxlength="20">
+  <input id="password" type="password" placeholder="Пароль (от 6 символов)">
 
-    <input
-      type="text"
-      id="loginInput"
-      placeholder="Ник"
-      autocomplete="username"
-      maxlength="20"
-      style="width:100%; padding:10px; border-radius:40px; border:1px solid #2a2a5a; background:#222; color:#fff; margin-bottom:12px; outline:none;"
-    >
+  <button id="registerBtn">Зарегистрироваться</button>
+  <button id="loginBtn">Войти</button>
 
-    <input
-      type="password"
-      id="passwordInput"
-      placeholder="Пароль"
-      autocomplete="current-password"
-      style="width:100%; padding:10px; border-radius:40px; border:1px solid #2a2a5a; background:#222; color:#fff; margin-bottom:12px; outline:none;"
-    >
-
-    <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
-      <button id="loginBtn"
-        style="background:#3366ff; border:none; padding:10px 30px; border-radius:40px; font-weight:700; color:#fff; cursor:pointer;">
-        Войти
-      </button>
-
-      <button id="registerBtn"
-        style="background:#22aa44; border:none; padding:10px 30px; border-radius:40px; font-weight:700; color:#fff; cursor:pointer;">
-        Зарегистрироваться
-      </button>
-    </div>
-
-    <div id="loginMessage"
-      style="margin-top:16px; text-align:center; color:#ff6666;">
-    </div>
-  </div>
+  <div id="message"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 
 <script>
-(async () => {
-  const loginInput = document.getElementById('loginInput');
-  const passwordInput = document.getElementById('passwordInput');
-  const message = document.getElementById('loginMessage');
-  const loginBtn = document.getElementById('loginBtn');
-  const registerBtn = document.getElementById('registerBtn');
+const usernameInput = document.getElementById('username');
+const passwordInput = document.getElementById('password');
+const message = document.getElementById('message');
 
-  function showMessage(text, success = false) {
-    message.textContent = text;
-    message.style.color = success ? '#88ff88' : '#ff6666';
+function showMessage(text, success = false) {
+  message.textContent = text;
+  message.style.color = success ? '#75ff91' : '#ff7777';
+}
+
+function getCredentials() {
+  const username = usernameInput.value.trim().toLowerCase();
+  const password = passwordInput.value;
+
+  if (!/^[a-z0-9_]{3,20}$/.test(username)) {
+    showMessage('Ник: английские буквы, цифры и _. От 3 до 20 символов.');
+    return null;
   }
 
-  function getUsername() {
-    return loginInput.value.trim().toLowerCase();
+  if (password.length < 6) {
+    showMessage('Пароль должен быть не короче 6 символов.');
+    return null;
   }
 
-  function getEmail(username) {
-    return username + '@membattle.example';
-  }
+  return { username, password, email: username + '@membattle.example' };
+}
 
-  if (typeof supabaseClient === 'undefined') {
-    showMessage('Ошибка подключения Supabase. Проверь supabase.js');
-    return;
-  }
+document.getElementById('registerBtn').onclick = async () => {
+  const credentials = getCredentials();
+  if (!credentials) return;
 
-  const { data, error } = await supabaseClient.auth.getSession();
+  const { username, password, email } = credentials;
+  const { data, error } = await supabaseClient.auth.signUp({
+    email,
+    password,
+    options: { data: { username } }
+  });
 
   if (error) {
     showMessage(error.message);
@@ -89,90 +105,33 @@
   }
 
   if (data.session) {
-    location.href = 'index.html';
+    location.replace('index.html');
+  } else {
+    showMessage('Аккаунт создан, но вход не выполнен. Проверь настройки Supabase.');
+  }
+};
+
+document.getElementById('loginBtn').onclick = async () => {
+  const credentials = getCredentials();
+  if (!credentials) return;
+
+  const { email, password } = credentials;
+  const { error } = await supabaseClient.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    showMessage('Неверный ник или пароль.');
     return;
   }
 
-  function validate() {
-    const username = getUsername();
-    const password = passwordInput.value;
+  location.replace('index.html');
+};
 
-    if (!/^[a-z0-9_]{3,20}$/.test(username)) {
-      showMessage('Ник: 3–20 символов, только английские буквы, цифры и _');
-      return false;
-    }
-
-    if (password.length < 6) {
-      showMessage('Пароль должен содержать минимум 6 символов');
-      return false;
-    }
-
-    return true;
-  }
-
-  loginBtn.addEventListener('click', async () => {
-    if (!validate()) return;
-
-    loginBtn.disabled = true;
-    registerBtn.disabled = true;
-
-    const username = getUsername();
-
-    const { error } = await supabaseClient.auth.signInWithPassword({
-      email: getEmail(username),
-      password: passwordInput.value
-    });
-
-    loginBtn.disabled = false;
-    registerBtn.disabled = false;
-
-    if (error) {
-      showMessage('Не удалось войти. Проверь ник и пароль.');
-      return;
-    }
-
-    showMessage('Вход выполнен!', true);
-    location.href = 'index.html';
-  });
-
-  registerBtn.addEventListener('click', async () => {
-    if (!validate()) return;
-
-    loginBtn.disabled = true;
-    registerBtn.disabled = true;
-
-    const username = getUsername();
-
-    const { data, error } = await supabaseClient.auth.signUp({
-      email: getEmail(username),
-      password: passwordInput.value,
-      options: {
-        data: {
-          username: username
-        }
-      }
-    });
-
-    loginBtn.disabled = false;
-    registerBtn.disabled = false;
-
-    if (error) {
-      showMessage(
-        error.message.includes('already registered')
-          ? 'Этот ник уже занят.'
-          : 'Ошибка регистрации: ' + error.message
-      );
-      return;
-    }
-
-    if (data.session) {
-      showMessage('Аккаунт создан!', true);
-      location.href = 'index.html';
-    } else {
-      showMessage('Аккаунт создан, но сессия не получена. Проверь настройки Supabase.');
-    }
-  });
-})();
+if (typeof supabaseClient === 'undefined') {
+  showMessage('Ошибка подключения Supabase. Проверь supabase.js.');
+}
 </script>
 
 </body>
