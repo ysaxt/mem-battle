@@ -3,23 +3,413 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Профиль — Mem Battle</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мем Битва — Профиль</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Russo+One&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+
   <style>
-    body { background:#f2f6ff; color:#1769e0; font-family:Arial; text-align:center; padding-top:20vh; }
-    h1 { font-size:40px; }
-    a { color:#e53945; font-weight:bold; }
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #f4f8ff;
+      color: #17233d;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .app {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+      padding: 18px 22px;
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 4px 18px rgba(30, 70, 130, 0.07);
+    }
+
+    .logo {
+      font-family: 'Russo One', sans-serif;
+      font-size: 25px;
+      color: #246bdb;
+      text-decoration: none;
+    }
+
+    .nav {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: #53627b;
+      font-weight: 700;
+      padding: 10px 14px;
+      border-radius: 10px;
+      transition: 0.2s;
+    }
+
+    .nav a:hover,
+    .nav a.active {
+      color: #246bdb;
+      background: #eaf2ff;
+    }
+
+    .page-title {
+      margin: 35px 0 20px;
+      font-family: 'Russo One', sans-serif;
+      font-size: 30px;
+    }
+
+    .profile-card {
+      background: white;
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 5px 22px rgba(30, 70, 130, 0.07);
+      margin-bottom: 20px;
+    }
+
+    .profile-top {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .avatar {
+      width: 78px;
+      height: 78px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #2f80ed, #70b7ff);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-family: 'Russo One', sans-serif;
+      font-size: 32px;
+    }
+
+    .username {
+      font-family: 'Russo One', sans-serif;
+      font-size: 25px;
+      margin: 0 0 7px;
+    }
+
+    .user-role {
+      color: #8290a8;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-top: 25px;
+    }
+
+    .stat {
+      padding: 20px;
+      background: #f4f8ff;
+      border-radius: 15px;
+    }
+
+    .stat-label {
+      color: #77869e;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-family: 'Russo One', sans-serif;
+      font-size: 27px;
+      color: #246bdb;
+    }
+
+    .section-title {
+      font-family: 'Russo One', sans-serif;
+      font-size: 21px;
+      margin: 28px 0 15px;
+    }
+
+    .memes-box {
+      background: white;
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 5px 22px rgba(30, 70, 130, 0.07);
+    }
+
+    .empty {
+      color: #8996aa;
+      text-align: center;
+      padding: 25px 10px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 25px;
+    }
+
+    .btn {
+      display: inline-block;
+      border: none;
+      border-radius: 11px;
+      padding: 12px 18px;
+      background: #246bdb;
+      color: white;
+      text-decoration: none;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn:hover {
+      background: #1558bd;
+    }
+
+    .btn-red {
+      background: #ed5353;
+    }
+
+    .btn-red:hover {
+      background: #d83c3c;
+    }
+
+    .message {
+      margin-top: 15px;
+      color: #ed5353;
+      font-weight: 600;
+    }
+
+    @media (max-width: 650px) {
+      .app {
+        padding: 12px;
+      }
+
+      .header {
+        padding: 15px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .page-title {
+        font-size: 25px;
+      }
+
+      .profile-card {
+        padding: 20px;
+      }
+    }
   </style>
 </head>
+
 <body>
-  <h1>Профиль</h1>
-  <h2>В РАЗРАБОТКЕ</h2>
-  <a href="index.html">На главную</a>
+  <div class="app">
+
+    <header class="header">
+      <a href="index.html" class="logo">МЕМ БИТВА</a>
+
+      <nav class="nav">
+        <a href="index.html">Битвы</a>
+        <a href="submit.html">Отправить мем</a>
+        <a href="top.html">Топ</a>
+        <a href="profile.html" class="active">Профиль</a>
+      </nav>
+    </header>
+
+    <h1 class="page-title">Мой профиль</h1>
+
+    <section class="profile-card">
+      <div class="profile-top">
+        <div class="avatar" id="avatar">?</div>
+
+        <div>
+          <h2 class="username" id="username">Загрузка...</h2>
+          <div class="user-role" id="userRole">Участник Мем Битвы</div>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">Баланс</div>
+          <div class="stat-value" id="coins">—</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">Отправлено мемов</div>
+          <div class="stat-value" id="memesCount">—</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">Победы мемов</div>
+          <div class="stat-value" id="wins">—</div>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <a href="submit.html" class="btn">Отправить мем</a>
+        <button class="btn btn-red" id="logoutBtn">Выйти из аккаунта</button>
+      </div>
+
+      <div class="message" id="message"></div>
+    </section>
+
+    <h2 class="section-title">Мои мемы</h2>
+
+    <section class="memes-box">
+      <div class="empty" id="myMemes">Загрузка мемов...</div>
+    </section>
+
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
+
   <script>
-    supabaseClient.auth.getSession().then(({data}) => {
-      if (!data.session) location.replace('login.html');
+    async function loadProfile() {
+      const message = document.getElementById('message');
+
+      const { data: { user }, error: authError } =
+        await supabaseClient.auth.getUser();
+
+      if (authError || !user) {
+        message.textContent = 'Войдите в аккаунт, чтобы посмотреть профиль.';
+        document.getElementById('username').textContent = 'Гость';
+        document.getElementById('myMemes').textContent =
+          'Войдите в аккаунт, чтобы увидеть свои мемы.';
+        return;
+      }
+
+      const { data: profile, error: profileError } = await supabaseClient
+        .from('profiles')
+        .select('username, coins, role')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError || !profile) {
+        message.textContent = 'Не удалось загрузить профиль.';
+        return;
+      }
+
+      document.getElementById('username').textContent =
+        profile.username || 'Игрок';
+
+      document.getElementById('avatar').textContent =
+        (profile.username || '?').charAt(0).toUpperCase();
+
+      document.getElementById('coins').textContent =
+        profile.coins ?? 0;
+
+      document.getElementById('userRole').textContent =
+        profile.role || 'Участник Мем Битвы';
+
+      const { data: memes, error: memesError } = await supabaseClient
+        .from('memes')
+        .select('id, image_url, status, wins, created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (memesError) {
+        document.getElementById('myMemes').textContent =
+          'Не удалось загрузить мемы.';
+        return;
+      }
+
+      const totalWins = (memes || []).reduce(
+        (sum, meme) => sum + Number(meme.wins || 0), 0
+      );
+
+      document.getElementById('memesCount').textContent =
+        (memes || []).length;
+
+      document.getElementById('wins').textContent = totalWins;
+
+      const memesContainer = document.getElementById('myMemes');
+
+      if (!memes || memes.length === 0) {
+        memesContainer.textContent = 'Ты пока не отправил ни одного мема.';
+        return;
+      }
+
+      memesContainer.innerHTML = memes.map(meme => {
+        const status = {
+          pending: 'На проверке',
+          approved: 'Одобрен',
+          rejected: 'Отклонён'
+        }[meme.status] || meme.status;
+
+        return `
+          <div style="
+            display:flex;
+            align-items:center;
+            gap:15px;
+            padding:12px 0;
+            border-bottom:1px solid #edf1f7;
+            text-align:left;
+          ">
+            <img
+              src="${escapeHtml(meme.image_url)}"
+              alt="Мем"
+              style="
+                width:90px;
+                height:75px;
+                object-fit:cover;
+                border-radius:10px;
+                background:#edf3fc;
+              "
+            >
+            <div>
+              <div style="font-weight:800;">${escapeHtml(status)}</div>
+              <div style="color:#8290a8;font-size:13px;margin-top:5px;">
+                Побед: ${Number(meme.wins || 0)}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      })[char]);
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      const { error } = await supabaseClient.auth.signOut();
+
+      if (error) {
+        document.getElementById('message').textContent =
+          'Не удалось выйти из аккаунта.';
+        return;
+      }
+
+      window.location.href = 'index.html';
     });
+
+    loadProfile();
   </script>
 </body>
 </html>
