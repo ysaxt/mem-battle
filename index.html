@@ -172,9 +172,7 @@
       transition: opacity 0.3s ease;
     }
 
-    .battle.changing {
-      opacity: 0;
-    }
+    .battle.changing { opacity: 0; }
 
     .meme-card {
       background: white;
@@ -184,11 +182,13 @@
       box-shadow: 0 10px 35px rgba(30, 80, 160, 0.08);
       text-align: center;
       min-width: 0;
-      transition: border-color 0.2s;
+      transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
     }
 
     .meme-card.winner {
-      border-color: #20a66a;
+      border: 3px solid #20a66a;
+      background: #eafff2;
+      box-shadow: 0 0 25px rgba(32, 166, 106, 0.3);
     }
 
     .meme-card img {
@@ -368,10 +368,7 @@
 
     await refreshBattle();
 
-    // Все пользователи регулярно получают состояние общего раунда
-    setInterval(refreshBattle, 1500);
-
-    // Обновляем отображение таймера
+    setInterval(refreshBattle, 1000);
     setInterval(updateTimer, 250);
   }
 
@@ -439,10 +436,10 @@
     document.getElementById('memeB').src = row.meme_b_url;
 
     battleElement.style.display = 'grid';
-
     battleElement.classList.remove('changing');
 
     updateBattleUI();
+    updateTimer();
   }
 
   function updateBattleUI() {
@@ -462,19 +459,19 @@
     document.getElementById('countB').textContent =
       'Голосов: ' + row.votes_b;
 
+    const completed = row.battle_status === 'completed';
+
     cardA.classList.toggle(
       'winner',
-      row.battle_status === 'finished' &&
-      row.winner_meme_id === row.meme_a_id
+      completed && row.winner_meme_id === row.meme_a_id
     );
 
     cardB.classList.toggle(
       'winner',
-      row.battle_status === 'finished' &&
-      row.winner_meme_id === row.meme_b_id
+      completed && row.winner_meme_id === row.meme_b_id
     );
 
-    if (row.battle_status === 'finished') {
+    if (completed) {
       voteA.disabled = true;
       voteB.disabled = true;
 
@@ -525,18 +522,18 @@
   function updateTimer() {
     if (!currentBattle) return;
 
-    if (currentBattle.battle_status === 'finished') {
-      timerElement.textContent = '0';
-      timerElement.classList.remove('urgent');
-      return;
-    }
-
     const endTime = new Date(currentBattle.ends_at).getTime();
 
     const secondsLeft = Math.max(
       0,
       Math.ceil((endTime - Date.now()) / 1000)
     );
+
+    if (currentBattle.battle_status === 'completed') {
+      timerElement.textContent = secondsLeft + ' сек.';
+      timerElement.classList.remove('urgent');
+      return;
+    }
 
     timerElement.textContent = secondsLeft + ' сек.';
     timerElement.classList.toggle('urgent', secondsLeft <= 5);
