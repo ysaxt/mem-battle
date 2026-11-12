@@ -135,10 +135,45 @@
       margin: 0;
     }
 
+    .timer-box {
+      width: fit-content;
+      min-width: 180px;
+      margin: 0 auto 30px;
+      padding: 15px 30px;
+      background: white;
+      border: 2px solid #dce7ff;
+      border-radius: 14px;
+      text-align: center;
+      box-shadow: 0 5px 20px rgba(30, 80, 160, 0.06);
+    }
+
+    .timer-label {
+      font-size: 12px;
+      font-weight: 800;
+      color: #71809b;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    #timer {
+      font-family: 'Russo One', sans-serif;
+      font-size: 36px;
+      color: #1769e0;
+      margin-top: 5px;
+    }
+
+    #timer.urgent { color: #e53945; }
+
     .battle {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 25px;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+
+    .battle.changing {
+      opacity: 0;
     }
 
     .meme-card {
@@ -149,6 +184,11 @@
       box-shadow: 0 10px 35px rgba(30, 80, 160, 0.08);
       text-align: center;
       min-width: 0;
+      transition: border-color 0.2s;
+    }
+
+    .meme-card.winner {
+      border-color: #20a66a;
     }
 
     .meme-card img {
@@ -173,11 +213,20 @@
       transition: 0.2s;
     }
 
-    .meme-card button:hover { background: #0d50b5; }
+    .meme-card button:hover:not(:disabled) {
+      background: #0d50b5;
+    }
 
     .meme-card button:disabled {
       opacity: 0.6;
       cursor: not-allowed;
+    }
+
+    .vote-count {
+      margin-top: 12px;
+      font-weight: 800;
+      color: #71809b;
+      min-height: 20px;
     }
 
     .vs {
@@ -194,19 +243,32 @@
       color: #71809b;
       font-size: 16px;
       margin: 30px 0;
+      line-height: 1.6;
+    }
+
+    .result-message {
+      color: #1769e0 !important;
+      font-weight: 800;
     }
 
     @media (max-width: 700px) {
       header { align-items: flex-start; }
+
       .right-side {
         width: 100%;
         justify-content: space-between;
       }
+
       .navigation { gap: 7px; }
+
       .navigation a { padding: 10px 12px; }
+
       .battle { grid-template-columns: 1fr; }
+
       .battle-heading h1 { font-size: 27px; }
+
       .meme-card img { height: 280px; }
+
       .vs { display: block; }
     }
   </style>
@@ -241,17 +303,26 @@
     <p>Какой мем лучше? Решать тебе!</p>
   </div>
 
-  <div id="message">Загружаем мемы...</div>
+  <div class="timer-box">
+    <div class="timer-label">До конца раунда</div>
+    <div id="timer">--:--</div>
+  </div>
+
+  <div id="message">Подключаемся к батлу...</div>
 
   <div class="battle" id="battle" style="display:none">
-    <div class="meme-card">
+    <div class="meme-card" id="cardA">
       <img id="memeA" src="" alt="Первый мем">
       <button id="voteA">Выбрать этот мем</button>
+      <div class="vote-count" id="countA"></div>
     </div>
 
-    <div class="meme-card">
+    <div class="vs">VS</div>
+
+    <div class="meme-card" id="cardB">
       <img id="memeB" src="" alt="Второй мем">
       <button id="voteB">Выбрать этот мем</button>
+      <div class="vote-count" id="countB"></div>
     </div>
   </div>
 </main>
@@ -260,7 +331,15 @@
 <script src="supabase.js"></script>
 
 <script>
-  let currentMemes = [];
+  let currentBattle = null;
+  let currentUser = null;
+  let lastBattleId = null;
+  let loadingBattle = false;
+  let transitionTimer = null;
+
+  const message = document.getElementById('message');
+  const battleElement = document.getElementById('battle');
+  const timerElement = document.getElementById('timer');
 
   async function initPage() {
     const { data, error } = await supabaseClient.auth.getSession();
@@ -270,12 +349,12 @@
       return;
     }
 
-    const user = data.session.user;
+    currentUser = data.session.user;
 
     const { data: profile, error: profileError } = await supabaseClient
       .from('profiles')
       .select('username, coins')
-      .eq('id', user.id)
+      .eq('id', currentUser.id)
       .single();
 
     if (profileError || !profile) {
@@ -287,54 +366,227 @@
         Number(profile.coins).toLocaleString('ru-RU');
     }
 
-    await loadBattle();
+    await refreshBattle();
+
+    // Все пользователи регулярно получают состояние общего раунда
+    setInterval(refreshBattle, 1500);
+
+    // Обновляем отображение таймера
+    setInterval(updateTimer, 250);
   }
 
-  async function loadBattle() {
-    const message = document.getElementById('message');
-    const battle = document.getElementById('battle');
+  async function refreshBattle() {
+    if (loadingBattle) return;
 
-    message.textContent = 'Загружаем мемы...';
-    battle.style.display = 'none';
+    loadingBattle = true;
 
-    const { data, error } = await supabaseClient
-      .from('memes')
-      .select('id, image_url, wins')
-      .eq('wins', 0);
+    try {
+      const { data, error } = await supabaseClient.rpc('get_current_battle');
 
-    if (error) {
-      message.textContent = 'Ошибка загрузки мемов: ' + error.message;
+      if (error) {
+        message.textContent = 'Ошибка загрузки раунда: ' + error.message;
+        return;
+      }
+
+      const row = Array.isArray(data) ? data[0] : data;
+
+      if (!row) {
+        currentBattle = null;
+        battleElement.style.display = 'none';
+        timerElement.textContent = '--:--';
+        message.textContent =
+          'Пока недостаточно мемов для батла. Нужно минимум два мема с нулём побед.';
+        return;
+      }
+
+      if (row.battle_id !== lastBattleId) {
+        showNewBattle(row);
+      } else {
+        currentBattle = row;
+        updateBattleUI();
+      }
+
+    } catch (error) {
+      message.textContent = 'Ошибка: ' + error.message;
+    } finally {
+      loadingBattle = false;
+    }
+  }
+
+  function showNewBattle(row) {
+    const isFirstBattle = lastBattleId === null;
+
+    if (transitionTimer) {
+      clearTimeout(transitionTimer);
+    }
+
+    if (!isFirstBattle) {
+      battleElement.classList.add('changing');
+
+      transitionTimer = setTimeout(() => {
+        applyBattle(row);
+      }, 300);
+    } else {
+      applyBattle(row);
+    }
+  }
+
+  function applyBattle(row) {
+    currentBattle = row;
+    lastBattleId = row.battle_id;
+
+    document.getElementById('memeA').src = row.meme_a_url;
+    document.getElementById('memeB').src = row.meme_b_url;
+
+    battleElement.style.display = 'grid';
+
+    battleElement.classList.remove('changing');
+
+    updateBattleUI();
+  }
+
+  function updateBattleUI() {
+    if (!currentBattle) return;
+
+    const row = currentBattle;
+
+    const voteA = document.getElementById('voteA');
+    const voteB = document.getElementById('voteB');
+
+    const cardA = document.getElementById('cardA');
+    const cardB = document.getElementById('cardB');
+
+    document.getElementById('countA').textContent =
+      'Голосов: ' + row.votes_a;
+
+    document.getElementById('countB').textContent =
+      'Голосов: ' + row.votes_b;
+
+    cardA.classList.toggle(
+      'winner',
+      row.battle_status === 'finished' &&
+      row.winner_meme_id === row.meme_a_id
+    );
+
+    cardB.classList.toggle(
+      'winner',
+      row.battle_status === 'finished' &&
+      row.winner_meme_id === row.meme_b_id
+    );
+
+    if (row.battle_status === 'finished') {
+      voteA.disabled = true;
+      voteB.disabled = true;
+
+      voteA.textContent = 'Раунд завершён';
+      voteB.textContent = 'Раунд завершён';
+
+      if (row.winner_meme_id === row.meme_a_id) {
+        message.textContent = 'Победил первый мем! +1 победа';
+      } else if (row.winner_meme_id === row.meme_b_id) {
+        message.textContent = 'Победил второй мем! +1 победа';
+      } else {
+        message.textContent = 'Ничья! Победителя нет.';
+      }
+
+      message.className = 'result-message';
       return;
     }
 
-    if (!data || data.length < 2) {
-      message.textContent = 'Пока недостаточно мемов для батла. Нужно минимум два.';
+    message.className = '';
+
+    if (row.my_vote) {
+      voteA.disabled = true;
+      voteB.disabled = true;
+
+      voteA.textContent =
+        row.my_vote === row.meme_a_id
+          ? 'Вы выбрали этот мем'
+          : 'Ожидаем результат';
+
+      voteB.textContent =
+        row.my_vote === row.meme_b_id
+          ? 'Вы выбрали этот мем'
+          : 'Ожидаем результат';
+
+      message.textContent =
+        'Твой голос принят! Ждём окончания раунда.';
+    } else {
+      voteA.disabled = false;
+      voteB.disabled = false;
+
+      voteA.textContent = 'Выбрать этот мем';
+      voteB.textContent = 'Выбрать этот мем';
+
+      message.textContent = 'Выбери лучший мем до окончания таймера!';
+    }
+  }
+
+  function updateTimer() {
+    if (!currentBattle) return;
+
+    if (currentBattle.battle_status === 'finished') {
+      timerElement.textContent = '0';
+      timerElement.classList.remove('urgent');
       return;
     }
 
-    const shuffled = [...data].sort(() => Math.random() - 0.5);
+    const endTime = new Date(currentBattle.ends_at).getTime();
 
-    currentMemes = shuffled.slice(0, 2);
+    const secondsLeft = Math.max(
+      0,
+      Math.ceil((endTime - Date.now()) / 1000)
+    );
 
-    document.getElementById('memeA').src = currentMemes[0].image_url;
-    document.getElementById('memeB').src = currentMemes[1].image_url;
+    timerElement.textContent = secondsLeft + ' сек.';
+    timerElement.classList.toggle('urgent', secondsLeft <= 5);
 
-    battle.style.display = 'grid';
-    message.textContent = '';
+    if (secondsLeft === 0) {
+      document.getElementById('voteA').disabled = true;
+      document.getElementById('voteB').disabled = true;
+      message.textContent = 'Время вышло! Подсчитываем результаты...';
+    }
   }
 
-  document.getElementById('voteA').onclick = () => nextBattle();
-  document.getElementById('voteB').onclick = () => nextBattle();
+  async function castVote(memeId) {
+    if (!currentBattle) return;
 
-  async function nextBattle() {
+    if (
+      currentBattle.battle_status !== 'active' ||
+      currentBattle.my_vote
+    ) {
+      return;
+    }
+
+    const battleId = currentBattle.battle_id;
+
     document.getElementById('voteA').disabled = true;
     document.getElementById('voteB').disabled = true;
 
-    await loadBattle();
+    const { error } = await supabaseClient.rpc('cast_battle_vote', {
+      p_battle_id: battleId,
+      p_meme_id: memeId
+    });
 
-    document.getElementById('voteA').disabled = false;
-    document.getElementById('voteB').disabled = false;
+    if (error) {
+      message.textContent = 'Не удалось проголосовать: ' + error.message;
+      await refreshBattle();
+      return;
+    }
+
+    currentBattle.my_vote = memeId;
+
+    updateBattleUI();
+    await refreshBattle();
   }
+
+  document.getElementById('voteA').onclick = () => {
+    if (currentBattle) castVote(currentBattle.meme_a_id);
+  };
+
+  document.getElementById('voteB').onclick = () => {
+    if (currentBattle) castVote(currentBattle.meme_b_id);
+  };
 
   document.getElementById('logoutBtn').onclick = async () => {
     const { error } = await supabaseClient.auth.signOut();
