@@ -4,36 +4,254 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Мем Битва</title>
+  <title>Mem Battle</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #f2f6ff;
+      font-family: 'Inter', Arial, sans-serif;
+      color: #172b4d;
+    }
+
+    header {
+      min-height: 105px;
+      background: white;
+      border-bottom: 2px solid #dce7ff;
+      padding: 20px 5%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 25px;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      font-family: 'Russo One', sans-serif;
+      font-size: 32px;
+      text-decoration: none;
+      color: #1769e0;
+      letter-spacing: 1px;
+    }
+
+    .logo span {
+      color: #e53945;
+    }
+
+    .navigation {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 15px;
+    }
+
+    .navigation a {
+      text-decoration: none;
+      color: #31517e;
+      background: #f2f6ff;
+      padding: 11px 17px;
+      border-radius: 9px;
+      font-weight: 700;
+      font-size: 14px;
+      transition: 0.2s;
+    }
+
+    .navigation a:hover,
+    .navigation a.active {
+      background: #1769e0;
+      color: white;
+    }
+
+    .left-side {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .right-side {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .user-info {
+      text-align: right;
+    }
+
+    .username {
+      font-weight: 800;
+      font-size: 16px;
+      color: #1769e0;
+    }
+
+    .balance {
+      margin-top: 5px;
+      font-size: 14px;
+      color: #71809b;
+    }
+
+    .balance span {
+      color: #e53945;
+      font-weight: 800;
+    }
+
+    .logout {
+      border: none;
+      background: #e53945;
+      color: white;
+      padding: 12px 19px;
+      border-radius: 9px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .logout:hover {
+      background: #c62835;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 60px auto;
+      padding: 0 25px;
+    }
+
+    .welcome {
+      background: white;
+      border: 2px solid #dce7ff;
+      border-radius: 20px;
+      padding: 45px;
+      box-shadow: 0 10px 35px rgba(30, 80, 160, 0.08);
+    }
+
+    .welcome h1 {
+      margin: 0 0 15px;
+      font-family: 'Russo One', sans-serif;
+      font-size: 36px;
+      color: #1769e0;
+    }
+
+    .welcome h1 span {
+      color: #e53945;
+    }
+
+    .welcome p {
+      color: #71809b;
+      font-size: 16px;
+    }
+
+    @media (max-width: 700px) {
+      header {
+        align-items: flex-start;
+      }
+
+      .right-side {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .navigation {
+        gap: 7px;
+      }
+
+      .navigation a {
+        padding: 10px 12px;
+      }
+
+      .welcome {
+        padding: 25px;
+      }
+
+      .welcome h1 {
+        font-size: 27px;
+      }
+    }
+  </style>
 </head>
-<body style="background:#111;color:white;font-family:Arial;text-align:center;padding-top:20vh">
-  <h1 id="status">ПРОВЕРКА...</h1>
+
+<body>
+
+  <header>
+    <div class="left-side">
+      <a href="index.html" class="logo">MEM <span>BATTLE</span></a>
+
+      <nav class="navigation">
+        <a href="index.html" class="active">Главная</a>
+        <a href="profile.html">Профиль</a>
+        <a href="submit.html">Отправить мем</a>
+        <a href="top.html">Топ</a>
+      </nav>
+    </div>
+
+    <div class="right-side">
+      <div class="user-info">
+        <div class="username" id="username">Загрузка...</div>
+        <div class="balance">Баланс: <span id="balance">...</span></div>
+      </div>
+
+      <button class="logout" id="logoutBtn">Выйти</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="welcome">
+      <h1>Добро пожаловать в <span>MEM BATTLE!</span></h1>
+      <p>Готов к мемным баталиям? Скоро здесь начнутся настоящие сражения!</p>
+    </section>
+  </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
+
   <script>
-    async function checkLogin() {
-      try {
-        if (typeof supabaseClient === 'undefined') {
-          throw new Error('Не удалось подключить supabase.js');
-        }
+    async function initPage() {
+      const { data, error } = await supabaseClient.auth.getSession();
 
-        const { data, error } = await supabaseClient.auth.getSession();
+      if (error || !data.session) {
+        location.replace('login.html');
+        return;
+      }
 
-        if (error) throw error;
+      const user = data.session.user;
 
-        if (data.session) {
-          document.getElementById('status').textContent = 'УСПЕШНО';
-        } else {
-          location.replace('./login.html');
-        }
-      } catch (error) {
-        document.getElementById('status').textContent =
-          'ОШИБКА: ' + error.message;
+      const { data: profile, error: profileError } = await supabaseClient
+        .from('profiles')
+        .select('username, coins')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError || !profile) {
+        document.getElementById('username').textContent = 'Пользователь';
+        document.getElementById('balance').textContent = 'Ошибка загрузки';
+      } else {
+        document.getElementById('username').textContent = profile.username;
+        document.getElementById('balance').textContent =
+          Number(profile.coins).toLocaleString('ru-RU');
       }
     }
 
-    checkLogin();
+    document.getElementById('logoutBtn').onclick = async () => {
+      const { error } = await supabaseClient.auth.signOut();
+
+      if (error) {
+        alert('Не удалось выйти: ' + error.message);
+        return;
+      }
+
+      location.replace('login.html');
+    };
+
+    initPage();
   </script>
+
 </body>
 </html>
