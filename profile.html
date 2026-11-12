@@ -8,13 +8,10 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Russo+One&display=swap" rel="stylesheet">
-
   <link rel="stylesheet" href="style.css">
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -38,7 +35,7 @@
       padding: 18px 22px;
       background: white;
       border-radius: 18px;
-      box-shadow: 0 4px 18px rgba(30, 70, 130, 0.07);
+      box-shadow: 0 4px 18px rgba(30,70,130,.07);
     }
 
     .logo {
@@ -60,11 +57,9 @@
       font-weight: 700;
       padding: 10px 14px;
       border-radius: 10px;
-      transition: 0.2s;
     }
 
-    .nav a:hover,
-    .nav a.active {
+    .nav a:hover, .nav a.active {
       color: #246bdb;
       background: #eaf2ff;
     }
@@ -75,11 +70,11 @@
       font-size: 30px;
     }
 
-    .profile-card {
+    .profile-card, .memes-box {
       background: white;
       border-radius: 20px;
       padding: 28px;
-      box-shadow: 0 5px 22px rgba(30, 70, 130, 0.07);
+      box-shadow: 0 5px 22px rgba(30,70,130,.07);
       margin-bottom: 20px;
     }
 
@@ -146,11 +141,72 @@
       margin: 28px 0 15px;
     }
 
-    .memes-box {
-      background: white;
-      padding: 25px;
-      border-radius: 20px;
-      box-shadow: 0 5px 22px rgba(30, 70, 130, 0.07);
+    .meme-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 15px 0;
+      border-bottom: 1px solid #edf1f7;
+    }
+
+    .meme-item:last-child {
+      border-bottom: none;
+    }
+
+    .meme-image {
+      width: 110px;
+      height: 90px;
+      object-fit: contain;
+      border-radius: 10px;
+      background: #edf3fc;
+      flex-shrink: 0;
+    }
+
+    .meme-details {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 7px 11px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .status-pending {
+      color: #a66a00;
+      background: #fff5dc;
+    }
+
+    .status-approved {
+      color: #16834d;
+      background: #eafff2;
+      border: 1px solid #b8efd0;
+    }
+
+    .status-rejected {
+      color: #d83c3c;
+      background: #fff0f0;
+      border: 1px solid #ffd0d0;
+    }
+
+    .meme-wins {
+      color: #8290a8;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+
+    .rejection-reason {
+      color: #d83c3c;
+      background: #fff4f4;
+      border-radius: 9px;
+      padding: 10px;
+      margin-top: 9px;
+      font-size: 13px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
     }
 
     .empty {
@@ -179,17 +235,7 @@
       font-size: 14px;
     }
 
-    .btn:hover {
-      background: #1558bd;
-    }
-
-    .btn-red {
-      background: #ed5353;
-    }
-
-    .btn-red:hover {
-      background: #d83c3c;
-    }
+    .btn-red { background: #ed5353; }
 
     .message {
       margin-top: 15px;
@@ -198,218 +244,218 @@
     }
 
     @media (max-width: 650px) {
-      .app {
-        padding: 12px;
-      }
-
-      .header {
-        padding: 15px;
-      }
-
-      .stats {
-        grid-template-columns: 1fr;
-      }
-
-      .page-title {
-        font-size: 25px;
-      }
-
-      .profile-card {
-        padding: 20px;
-      }
+      .app { padding: 12px; }
+      .header { padding: 15px; }
+      .stats { grid-template-columns: 1fr; }
+      .page-title { font-size: 25px; }
+      .profile-card, .memes-box { padding: 20px; }
+      .meme-image { width: 85px; height: 75px; }
     }
   </style>
 </head>
 
 <body>
-  <div class="app">
+<div class="app">
 
-    <header class="header">
-      <a href="index.html" class="logo">МЕМ БИТВА</a>
+  <header class="header">
+    <a href="index.html" class="logo">МЕМ БИТВА</a>
 
-      <nav class="nav">
-        <a href="index.html">Битвы</a>
-        <a href="submit.html">Отправить мем</a>
-        <a href="top.html">Топ</a>
-        <a href="profile.html" class="active">Профиль</a>
-      </nav>
-    </header>
+    <nav class="nav">
+      <a href="index.html">Битвы</a>
+      <a href="submit.html">Отправить мем</a>
+      <a href="top.html">Топ</a>
+      <a href="profile.html" class="active">Профиль</a>
+    </nav>
+  </header>
 
-    <h1 class="page-title">Мой профиль</h1>
+  <h1 class="page-title">Мой профиль</h1>
 
-    <section class="profile-card">
-      <div class="profile-top">
-        <div class="avatar" id="avatar">?</div>
+  <section class="profile-card">
+    <div class="profile-top">
+      <div class="avatar" id="avatar">?</div>
 
-        <div>
-          <h2 class="username" id="username">Загрузка...</h2>
-          <div class="user-role" id="userRole">Участник Мем Битвы</div>
-        </div>
+      <div>
+        <h2 class="username" id="username">Загрузка...</h2>
+        <div class="user-role" id="userRole">Участник Мем Битвы</div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">Баланс</div>
+        <div class="stat-value" id="coins">—</div>
       </div>
 
-      <div class="stats">
-        <div class="stat">
-          <div class="stat-label">Баланс</div>
-          <div class="stat-value" id="coins">—</div>
-        </div>
-
-        <div class="stat">
-          <div class="stat-label">Отправлено мемов</div>
-          <div class="stat-value" id="memesCount">—</div>
-        </div>
-
-        <div class="stat">
-          <div class="stat-label">Победы мемов</div>
-          <div class="stat-value" id="wins">—</div>
-        </div>
+      <div class="stat">
+        <div class="stat-label">Отправлено мемов</div>
+        <div class="stat-value" id="memesCount">—</div>
       </div>
 
-      <div class="buttons">
-        <a href="submit.html" class="btn">Отправить мем</a>
-        <button class="btn btn-red" id="logoutBtn">Выйти из аккаунта</button>
+      <div class="stat">
+        <div class="stat-label">Победы мемов</div>
+        <div class="stat-value" id="wins">—</div>
       </div>
+    </div>
 
-      <div class="message" id="message"></div>
-    </section>
+    <div class="buttons">
+      <a href="submit.html" class="btn">Отправить мем</a>
+      <button class="btn btn-red" id="logoutBtn">Выйти из аккаунта</button>
+    </div>
 
-    <h2 class="section-title">Мои мемы</h2>
+    <div class="message" id="message"></div>
+  </section>
 
-    <section class="memes-box">
-      <div class="empty" id="myMemes">Загрузка мемов...</div>
-    </section>
+  <h2 class="section-title">Мои мемы</h2>
 
-  </div>
+  <section class="memes-box">
+    <div class="empty" id="myMemes">Загрузка мемов...</div>
+  </section>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase.js"></script>
+</div>
 
-  <script>
-    async function loadProfile() {
-      const message = document.getElementById('message');
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 
-      const { data: { user }, error: authError } =
-        await supabaseClient.auth.getUser();
+<script>
+  const message = document.getElementById('message');
 
-      if (authError || !user) {
-        message.textContent = 'Войдите в аккаунт, чтобы посмотреть профиль.';
-        document.getElementById('username').textContent = 'Гость';
-        document.getElementById('myMemes').textContent =
-          'Войдите в аккаунт, чтобы увидеть свои мемы.';
-        return;
-      }
+  function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, char => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    })[char]);
+  }
 
-      const { data: profile, error: profileError } = await supabaseClient
-        .from('profiles')
-        .select('username, coins, role')
-        .eq('id', user.id)
-        .single();
+  async function loadProfile() {
+    const { data: authData, error: authError } =
+      await supabaseClient.auth.getUser();
 
-      if (profileError || !profile) {
-        message.textContent = 'Не удалось загрузить профиль.';
-        return;
-      }
+    if (authError || !authData.user) {
+      message.textContent = 'Войди в аккаунт, чтобы посмотреть профиль.';
+      document.getElementById('username').textContent = 'Гость';
+      document.getElementById('myMemes').textContent =
+        'Войди в аккаунт, чтобы увидеть свои мемы.';
+      return;
+    }
 
-      document.getElementById('username').textContent =
-        profile.username || 'Игрок';
+    const user = authData.user;
 
-      document.getElementById('avatar').textContent =
-        (profile.username || '?').charAt(0).toUpperCase();
+    const { data: profile, error: profileError } = await supabaseClient
+      .from('profiles')
+      .select('username, coins, role')
+      .eq('id', user.id)
+      .single();
 
-      document.getElementById('coins').textContent =
-        profile.coins ?? 0;
+    if (profileError || !profile) {
+      message.textContent = 'Не удалось загрузить профиль.';
+      return;
+    }
 
-      document.getElementById('userRole').textContent =
-        profile.role || 'Участник Мем Битвы';
+    document.getElementById('username').textContent =
+      profile.username || 'Игрок';
 
-      const { data: memes, error: memesError } = await supabaseClient
-        .from('memes')
-        .select('id, image_url, status, wins, created_at')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+    document.getElementById('avatar').textContent =
+      (profile.username || '?').charAt(0).toUpperCase();
 
-      if (memesError) {
-        document.getElementById('myMemes').textContent =
-          'Не удалось загрузить мемы.';
-        return;
-      }
+    document.getElementById('coins').textContent =
+      profile.coins ?? 0;
 
-      const totalWins = (memes || []).reduce(
-        (sum, meme) => sum + Number(meme.wins || 0), 0
+    document.getElementById('userRole').textContent =
+      profile.role === 'admin' ? 'Администратор' : 'Участник Мем Битвы';
+
+    const { data: memes, error: memesError } = await supabaseClient
+      .from('memes')
+      .select('id, image_url, status, wins, created_at, rejection_reason')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (memesError) {
+      document.getElementById('myMemes').textContent =
+        'Не удалось загрузить мемы.';
+      console.error(memesError);
+      return;
+    }
+
+    const totalWins = (memes || []).reduce(
+      (sum, meme) => sum + Number(meme.wins || 0), 0
+    );
+
+    document.getElementById('memesCount').textContent = memes.length;
+    document.getElementById('wins').textContent = totalWins;
+
+    const container = document.getElementById('myMemes');
+
+    if (memes.length === 0) {
+      container.textContent = 'Ты пока не отправил ни одного мема.';
+      return;
+    }
+
+    container.replaceChildren();
+
+    memes.forEach(meme => {
+      const item = document.createElement('div');
+      item.className = 'meme-item';
+
+      const img = document.createElement('img');
+      img.className = 'meme-image';
+      img.src = meme.image_url;
+      img.alt = 'Мой мем';
+      img.loading = 'lazy';
+
+      const details = document.createElement('div');
+      details.className = 'meme-details';
+
+      const statusNames = {
+        pending: 'На проверке',
+        approved: 'Одобрен',
+        rejected: 'Отклонён'
+      };
+
+      const status = document.createElement('span');
+      status.className = 'status status-' + (
+        ['pending', 'approved', 'rejected'].includes(meme.status)
+          ? meme.status
+          : 'pending'
       );
+      status.textContent = statusNames[meme.status] || 'Неизвестный статус';
 
-      document.getElementById('memesCount').textContent =
-        (memes || []).length;
+      const wins = document.createElement('div');
+      wins.className = 'meme-wins';
+      wins.textContent = 'Побед: ' + Number(meme.wins || 0);
 
-      document.getElementById('wins').textContent = totalWins;
+      details.append(status, wins);
 
-      const memesContainer = document.getElementById('myMemes');
+      if (meme.status === 'rejected') {
+        const reason = document.createElement('div');
+        reason.className = 'rejection-reason';
+        reason.textContent =
+          'Причина отклонения: ' +
+          (meme.rejection_reason || 'Причина не указана');
 
-      if (!memes || memes.length === 0) {
-        memesContainer.textContent = 'Ты пока не отправил ни одного мема.';
-        return;
+        details.appendChild(reason);
       }
 
-      memesContainer.innerHTML = memes.map(meme => {
-        const status = {
-          pending: 'На проверке',
-          approved: 'Одобрен',
-          rejected: 'Отклонён'
-        }[meme.status] || meme.status;
-
-        return `
-          <div style="
-            display:flex;
-            align-items:center;
-            gap:15px;
-            padding:12px 0;
-            border-bottom:1px solid #edf1f7;
-            text-align:left;
-          ">
-            <img
-              src="${escapeHtml(meme.image_url)}"
-              alt="Мем"
-              style="
-                width:90px;
-                height:75px;
-                object-fit:cover;
-                border-radius:10px;
-                background:#edf3fc;
-              "
-            >
-            <div>
-              <div style="font-weight:800;">${escapeHtml(status)}</div>
-              <div style="color:#8290a8;font-size:13px;margin-top:5px;">
-                Побед: ${Number(meme.wins || 0)}
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function escapeHtml(value) {
-      return String(value ?? '').replace(/[&<>"']/g, char => ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
-      })[char]);
-    }
-
-    document.getElementById('logoutBtn').addEventListener('click', async () => {
-      const { error } = await supabaseClient.auth.signOut();
-
-      if (error) {
-        document.getElementById('message').textContent =
-          'Не удалось выйти из аккаунта.';
-        return;
-      }
-
-      window.location.href = 'index.html';
+      item.append(img, details);
+      container.appendChild(item);
     });
+  }
 
-    loadProfile();
-  </script>
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    const { error } = await supabaseClient.auth.signOut();
+
+    if (error) {
+      message.textContent = 'Не удалось выйти из аккаунта.';
+      return;
+    }
+
+    window.location.href = 'index.html';
+  });
+
+  loadProfile();
+</script>
+
 </body>
 </html>
