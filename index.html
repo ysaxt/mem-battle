@@ -111,20 +111,20 @@
     .logout:hover { background: #c62835; }
 
     main {
-      max-width: 1200px;
-      margin: 45px auto;
+      max-width: 1400px;
+      margin: 40px auto;
       padding: 0 25px;
     }
 
     .battle-heading {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 35px;
     }
 
     .battle-heading h1 {
       font-family: 'Russo One', sans-serif;
       color: #1769e0;
-      font-size: 34px;
+      font-size: 36px;
       margin: 0 0 10px;
     }
 
@@ -135,123 +135,183 @@
       margin: 0;
     }
 
-    .timer-box {
-      width: fit-content;
-      min-width: 180px;
-      margin: 0 auto 30px;
-      padding: 15px 30px;
-      background: white;
-      border: 2px solid #dce7ff;
-      border-radius: 14px;
+    #message {
       text-align: center;
-      box-shadow: 0 5px 20px rgba(30, 80, 160, 0.06);
+      color: #71809b;
+      font-size: 15px;
+      margin: 25px 0;
+      line-height: 1.6;
     }
 
-    .timer-label {
+    #message.error { color: #e53945; }
+
+    .category {
+      margin-bottom: 42px;
+    }
+
+    .category-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 17px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #dce7ff;
+    }
+
+    .category-header h2 {
+      font-family: 'Russo One', sans-serif;
+      color: #1769e0;
+      font-size: 23px;
+      margin: 0;
+    }
+
+    .category-info {
+      color: #71809b;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .battles-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .battle-card {
+      background: white;
+      border: 2px solid #dce7ff;
+      border-radius: 16px;
+      padding: 15px;
+      box-shadow: 0 7px 25px rgba(30, 80, 160, 0.06);
+      min-width: 0;
+    }
+
+    .battle-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 13px;
+    }
+
+    .battle-number {
+      color: #71809b;
       font-size: 12px;
       font-weight: 800;
-      color: #71809b;
-      text-transform: uppercase;
-      letter-spacing: 1px;
     }
 
-    #timer {
+    .battle-timer {
       font-family: 'Russo One', sans-serif;
-      font-size: 36px;
       color: #1769e0;
-      margin-top: 5px;
+      font-size: 17px;
+      white-space: nowrap;
     }
 
-    #timer.urgent { color: #e53945; }
+    .battle-timer.urgent { color: #e53945; }
 
-    .battle {
+    .battle-pair {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 25px;
-      opacity: 1;
-      transition: opacity 0.3s ease;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 12px;
+      align-items: stretch;
     }
-
-    .battle.changing { opacity: 0; }
 
     .meme-card {
-      background: white;
-      border: 2px solid #dce7ff;
-      border-radius: 18px;
-      padding: 18px;
-      box-shadow: 0 10px 35px rgba(30, 80, 160, 0.08);
-      text-align: center;
       min-width: 0;
-      transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
+      padding: 9px;
+      border: 2px solid #edf2ff;
+      border-radius: 12px;
+      text-align: center;
+      transition: 0.2s;
     }
 
     .meme-card.winner {
-      border: 3px solid #20a66a;
+      border-color: #20a66a;
       background: #eafff2;
-      box-shadow: 0 0 25px rgba(32, 166, 106, 0.3);
     }
 
     .meme-card img {
       width: 100%;
-      height: 350px;
+      height: 190px;
       object-fit: contain;
       background: #f8faff;
-      border-radius: 12px;
+      border-radius: 8px;
+      display: block;
     }
 
-    .meme-card button {
+    .vote-button {
       width: 100%;
-      margin-top: 15px;
-      padding: 15px;
+      margin-top: 10px;
+      padding: 11px 5px;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       background: #1769e0;
       color: white;
-      font-size: 16px;
+      font-size: 13px;
       font-weight: 800;
       cursor: pointer;
       transition: 0.2s;
     }
 
-    .meme-card button:hover:not(:disabled) {
+    .vote-button:hover:not(:disabled) {
       background: #0d50b5;
     }
 
-    .meme-card button:disabled {
-      opacity: 0.6;
+    .vote-button:disabled {
+      opacity: 0.55;
       cursor: not-allowed;
     }
 
     .vote-count {
-      margin-top: 12px;
-      font-weight: 800;
+      margin-top: 8px;
       color: #71809b;
-      min-height: 20px;
+      font-size: 12px;
+      font-weight: 800;
     }
 
     .vs {
-      text-align: center;
-      color: #e53945;
-      font-family: 'Russo One', sans-serif;
-      font-size: 24px;
-      margin: 20px 0;
       display: none;
     }
 
-    #message {
-      text-align: center;
+    .battle-status {
+      margin-top: 13px;
+      padding: 9px;
+      border-radius: 8px;
+      background: #f2f6ff;
       color: #71809b;
-      font-size: 16px;
-      margin: 30px 0;
-      line-height: 1.6;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
     }
 
-    .result-message {
-      color: #1769e0 !important;
-      font-weight: 800;
+    .battle-status.result {
+      color: #1769e0;
+      background: #eaf2ff;
     }
 
-    @media (max-width: 700px) {
+    .empty-category {
+      padding: 20px;
+      text-align: center;
+      color: #9aa8c0;
+      background: white;
+      border: 1px dashed #dce7ff;
+      border-radius: 12px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 850px) {
+      .battles-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .meme-card img {
+        height: 230px;
+      }
+    }
+
+    @media (max-width: 550px) {
       header { align-items: flex-start; }
 
       .right-side {
@@ -261,15 +321,34 @@
 
       .navigation { gap: 7px; }
 
-      .navigation a { padding: 10px 12px; }
+      .navigation a {
+        padding: 9px 10px;
+        font-size: 12px;
+      }
 
-      .battle { grid-template-columns: 1fr; }
+      main {
+        padding: 0 12px;
+        margin-top: 28px;
+      }
 
-      .battle-heading h1 { font-size: 27px; }
+      .battle-heading h1 { font-size: 28px; }
 
-      .meme-card img { height: 280px; }
+      .category-header h2 { font-size: 19px; }
 
-      .vs { display: block; }
+      .battle-card { padding: 10px; }
+
+      .battle-pair { gap: 7px; }
+
+      .meme-card { padding: 6px; }
+
+      .meme-card img { height: 145px; }
+
+      .vote-button {
+        font-size: 11px;
+        padding: 10px 3px;
+      }
+
+      .battle-timer { font-size: 15px; }
     }
   </style>
 </head>
@@ -300,46 +379,368 @@
 <main>
   <div class="battle-heading">
     <h1>MEM <span>BATTLE</span></h1>
-    <p>Какой мем лучше? Решать тебе!</p>
+    <p>Выбирай лучшие мемы во всех категориях!</p>
   </div>
 
-  <div class="timer-box">
-    <div class="timer-label">До конца раунда</div>
-    <div id="timer">--:--</div>
-  </div>
+  <div id="message">Подключаемся к батлам...</div>
 
-  <div id="message">Подключаемся к батлу...</div>
-
-  <div class="battle" id="battle" style="display:none">
-    <div class="meme-card" id="cardA">
-      <img id="memeA" src="" alt="Первый мем">
-      <button id="voteA">Выбрать этот мем</button>
-      <div class="vote-count" id="countA"></div>
-    </div>
-
-    <div class="vs">VS</div>
-
-    <div class="meme-card" id="cardB">
-      <img id="memeB" src="" alt="Второй мем">
-      <button id="voteB">Выбрать этот мем</button>
-      <div class="vote-count" id="countB"></div>
-    </div>
-  </div>
+  <div id="categories"></div>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 
 <script>
-  let currentBattle = null;
+  const categories = [
+    { name: '30 секунд', duration: 30, slots: 5 },
+    { name: '1 минута', duration: 60, slots: 4 },
+    { name: '3 минуты', duration: 180, slots: 3 },
+    { name: '5 минут', duration: 300, slots: 2 },
+    { name: '10 минут', duration: 600, slots: 1 },
+    { name: '1 час', duration: 3600, slots: 1 },
+    { name: '24 часа', duration: 86400, slots: 1 },
+    { name: '7 дней', duration: 604800, slots: 1 }
+  ];
+
   let currentUser = null;
-  let lastBattleId = null;
-  let loadingBattle = false;
-  let transitionTimer = null;
+  let loadingBattles = false;
+
+  const battleElements = new Map();
+  const votingBattles = new Set();
 
   const message = document.getElementById('message');
-  const battleElement = document.getElementById('battle');
-  const timerElement = document.getElementById('timer');
+  const categoriesContainer = document.getElementById('categories');
+
+  function getCategory(row) {
+    return categories.find(category =>
+      Number(category.duration) === Number(row.duration_seconds)
+    );
+  }
+
+  function formatTime(seconds) {
+    seconds = Math.max(0, seconds);
+
+    if (seconds < 60) {
+      return seconds + ' сек.';
+    }
+
+    if (seconds < 3600) {
+      const minutes = Math.floor(seconds / 60);
+      const remaining = seconds % 60;
+
+      return minutes + ':' + String(remaining).padStart(2, '0');
+    }
+
+    if (seconds < 86400) {
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+
+      return hours + ' ч. ' + minutes + ' мин.';
+    }
+
+    const days = Math.floor(seconds / 86400);
+    const hours = Math.floor((seconds % 86400) / 3600);
+
+    return days + ' д. ' + hours + ' ч.';
+  }
+
+  function getSecondsLeft(row) {
+    return Math.max(
+      0,
+      Math.ceil((new Date(row.ends_at).getTime() - Date.now()) / 1000)
+    );
+  }
+
+  function createCategorySections() {
+    categoriesContainer.innerHTML = '';
+
+    categories.forEach(category => {
+      const section = document.createElement('section');
+      section.className = 'category';
+      section.dataset.duration = category.duration;
+
+      section.innerHTML = `
+        <div class="category-header">
+          <h2>${category.name}</h2>
+          <div class="category-info">
+            <span class="category-count">0</span> / ${category.slots} батлов
+          </div>
+        </div>
+        <div class="battles-grid"></div>
+      `;
+
+      categoriesContainer.appendChild(section);
+    });
+  }
+
+  function createBattleCard(row) {
+    const card = document.createElement('div');
+    card.className = 'battle-card';
+    card.dataset.battleId = row.battle_id;
+
+    card.innerHTML = `
+      <div class="battle-top">
+        <div class="battle-number">БАТЛ</div>
+        <div class="battle-timer">--</div>
+      </div>
+
+      <div class="battle-pair">
+        <div class="meme-card card-a">
+          <img class="image-a" alt="Первый мем">
+          <button class="vote-button vote-a">Выбрать мем</button>
+          <div class="vote-count count-a">Голосов: 0</div>
+        </div>
+
+        <div class="meme-card card-b">
+          <img class="image-b" alt="Второй мем">
+          <button class="vote-button vote-b">Выбрать мем</button>
+          <div class="vote-count count-b">Голосов: 0</div>
+        </div>
+      </div>
+
+      <div class="battle-status">Загрузка...</div>
+    `;
+
+    card.querySelector('.vote-a').addEventListener('click', () => {
+      castVote(row.battle_id, row.meme_a_id);
+    });
+
+    card.querySelector('.vote-b').addEventListener('click', () => {
+      castVote(row.battle_id, row.meme_b_id);
+    });
+
+    return card;
+  }
+
+  function updateBattleCard(card, row) {
+    const secondsLeft = getSecondsLeft(row);
+    const completed = row.battle_status === 'completed';
+    const myVote = row.my_vote;
+    const voting = votingBattles.has(row.battle_id);
+
+    const imageA = card.querySelector('.image-a');
+    const imageB = card.querySelector('.image-b');
+
+    if (imageA.src !== row.meme_a_url) {
+      imageA.src = row.meme_a_url;
+    }
+
+    if (imageB.src !== row.meme_b_url) {
+      imageB.src = row.meme_b_url;
+    }
+
+    card.querySelector('.count-a').textContent =
+      'Голосов: ' + (row.votes_a || 0);
+
+    card.querySelector('.count-b').textContent =
+      'Голосов: ' + (row.votes_b || 0);
+
+    const timer = card.querySelector('.battle-timer');
+    timer.textContent = completed
+      ? 'Результат'
+      : formatTime(secondsLeft);
+
+    timer.classList.toggle(
+      'urgent',
+      !completed && secondsLeft <= 5
+    );
+
+    const cardA = card.querySelector('.card-a');
+    const cardB = card.querySelector('.card-b');
+
+    cardA.classList.toggle(
+      'winner',
+      completed && row.winner_meme_id === row.meme_a_id
+    );
+
+    cardB.classList.toggle(
+      'winner',
+      completed && row.winner_meme_id === row.meme_b_id
+    );
+
+    const voteA = card.querySelector('.vote-a');
+    const voteB = card.querySelector('.vote-b');
+
+    const status = card.querySelector('.battle-status');
+
+    if (completed) {
+      voteA.disabled = true;
+      voteB.disabled = true;
+
+      voteA.textContent = 'Раунд завершён';
+      voteB.textContent = 'Раунд завершён';
+
+      status.className = 'battle-status result';
+
+      if (row.winner_meme_id === row.meme_a_id) {
+        status.textContent = 'Победил первый мем!';
+      } else if (row.winner_meme_id === row.meme_b_id) {
+        status.textContent = 'Победил второй мем!';
+      } else {
+        status.textContent = 'Ничья!';
+      }
+
+      return;
+    }
+
+    if (secondsLeft === 0) {
+      voteA.disabled = true;
+      voteB.disabled = true;
+
+      voteA.textContent = 'Время вышло';
+      voteB.textContent = 'Время вышло';
+
+      status.textContent = 'Подсчитываем результаты...';
+      status.className = 'battle-status';
+      return;
+    }
+
+    if (myVote) {
+      voteA.disabled = true;
+      voteB.disabled = true;
+
+      voteA.textContent = myVote === row.meme_a_id
+        ? 'Ты выбрал этот мем'
+        : 'Голос принят';
+
+      voteB.textContent = myVote === row.meme_b_id
+        ? 'Ты выбрал этот мем'
+        : 'Голос принят';
+
+      status.textContent = 'Твой голос принят!';
+      status.className = 'battle-status';
+      return;
+    }
+
+    voteA.disabled = voting;
+    voteB.disabled = voting;
+
+    voteA.textContent = 'Выбрать мем';
+    voteB.textContent = 'Выбрать мем';
+
+    status.textContent = voting
+      ? 'Отправляем голос...'
+      : 'Выбери лучший мем!';
+
+    status.className = 'battle-status';
+  }
+
+  async function refreshBattles() {
+    if (loadingBattles) return;
+
+    loadingBattles = true;
+
+    try {
+      const { data, error } = await supabaseClient.rpc('get_battles');
+
+      if (error) {
+        message.textContent = 'Ошибка загрузки батлов: ' + error.message;
+        message.className = 'error';
+        return;
+      }
+
+      message.textContent = '';
+      message.className = '';
+
+      const rows = Array.isArray(data) ? data : [];
+      const receivedIds = new Set();
+
+      categories.forEach(category => {
+        const section = categoriesContainer.querySelector(
+          `[data-duration="${category.duration}"]`
+        );
+
+        const grid = section.querySelector('.battles-grid');
+
+        const categoryRows = rows.filter(row =>
+          Number(row.duration_seconds) === category.duration
+        );
+
+        section.querySelector('.category-count').textContent =
+          categoryRows.length;
+
+        if (categoryRows.length === 0) {
+          grid.innerHTML = `
+            <div class="empty-category">
+              Пока нет батлов. Они появятся, когда будут доступны мемы.
+            </div>
+          `;
+          return;
+        }
+
+        const empty = grid.querySelector('.empty-category');
+        if (empty) empty.remove();
+
+        categoryRows.forEach(row => {
+          receivedIds.add(row.battle_id);
+
+          let card = battleElements.get(row.battle_id);
+
+          if (!card) {
+            card = createBattleCard(row);
+            battleElements.set(row.battle_id, card);
+            grid.appendChild(card);
+          } else if (card.parentElement !== grid) {
+            grid.appendChild(card);
+          }
+
+          updateBattleCard(card, row);
+        });
+      });
+
+      for (const [battleId, card] of battleElements.entries()) {
+        if (!receivedIds.has(battleId)) {
+          card.remove();
+          battleElements.delete(battleId);
+          votingBattles.delete(battleId);
+        }
+      }
+
+    } catch (error) {
+      message.textContent = 'Ошибка: ' + error.message;
+      message.className = 'error';
+    } finally {
+      loadingBattles = false;
+    }
+  }
+
+  async function castVote(battleId, memeId) {
+    if (votingBattles.has(battleId)) return;
+
+    const card = battleElements.get(battleId);
+    if (!card) return;
+
+    const buttons = card.querySelectorAll('.vote-button');
+
+    if (buttons[0].disabled || buttons[1].disabled) return;
+
+    votingBattles.add(battleId);
+    buttons.forEach(button => button.disabled = true);
+
+    card.querySelector('.battle-status').textContent =
+      'Отправляем голос...';
+
+    try {
+      const { error } = await supabaseClient.rpc('cast_battle_vote', {
+        p_battle_id: battleId,
+        p_meme_id: memeId
+      });
+
+      if (error) {
+        card.querySelector('.battle-status').textContent =
+          'Ошибка голосования: ' + error.message;
+      }
+
+      await refreshBattles();
+
+    } catch (error) {
+      card.querySelector('.battle-status').textContent =
+        'Ошибка: ' + error.message;
+    } finally {
+      votingBattles.delete(battleId);
+      await refreshBattles();
+    }
+  }
 
   async function initPage() {
     const { data, error } = await supabaseClient.auth.getSession();
@@ -366,224 +767,31 @@
         Number(profile.coins).toLocaleString('ru-RU');
     }
 
-    await refreshBattle();
+    createCategorySections();
 
-    setInterval(refreshBattle, 1000);
-    setInterval(updateTimer, 250);
+    await refreshBattles();
+
+    setInterval(refreshBattles, 1000);
+
+    setInterval(() => {
+      battleElements.forEach((card, battleId) => {
+        const timer = card.querySelector('.battle-timer');
+
+        // Таймер обновляется локально между запросами к базе.
+        const endTime = card.dataset.endsAt;
+
+        if (endTime) {
+          const seconds = Math.max(
+            0,
+            Math.ceil((new Date(endTime).getTime() - Date.now()) / 1000)
+          );
+
+          timer.textContent = formatTime(seconds);
+          timer.classList.toggle('urgent', seconds <= 5);
+        }
+      });
+    }, 250);
   }
-
-  async function refreshBattle() {
-    if (loadingBattle) return;
-
-    loadingBattle = true;
-
-    try {
-      const { data, error } = await supabaseClient.rpc('get_current_battle');
-
-      if (error) {
-        message.textContent = 'Ошибка загрузки раунда: ' + error.message;
-        return;
-      }
-
-      const row = Array.isArray(data) ? data[0] : data;
-
-      if (!row) {
-        currentBattle = null;
-        battleElement.style.display = 'none';
-        timerElement.textContent = '--:--';
-        message.textContent =
-          'Пока недостаточно мемов для батла.';
-        return;
-      }
-
-      if (row.battle_id !== lastBattleId) {
-        showNewBattle(row);
-      } else {
-        currentBattle = row;
-        updateBattleUI();
-      }
-
-    } catch (error) {
-      message.textContent = 'Ошибка: ' + error.message;
-    } finally {
-      loadingBattle = false;
-    }
-  }
-
-  function showNewBattle(row) {
-    const isFirstBattle = lastBattleId === null;
-
-    if (transitionTimer) {
-      clearTimeout(transitionTimer);
-    }
-
-    if (!isFirstBattle) {
-      battleElement.classList.add('changing');
-
-      transitionTimer = setTimeout(() => {
-        applyBattle(row);
-      }, 300);
-    } else {
-      applyBattle(row);
-    }
-  }
-
-  function applyBattle(row) {
-    currentBattle = row;
-    lastBattleId = row.battle_id;
-
-    document.getElementById('memeA').src = row.meme_a_url;
-    document.getElementById('memeB').src = row.meme_b_url;
-
-    battleElement.style.display = 'grid';
-    battleElement.classList.remove('changing');
-
-    updateBattleUI();
-    updateTimer();
-  }
-
-  function updateBattleUI() {
-    if (!currentBattle) return;
-
-    const row = currentBattle;
-
-    const voteA = document.getElementById('voteA');
-    const voteB = document.getElementById('voteB');
-
-    const cardA = document.getElementById('cardA');
-    const cardB = document.getElementById('cardB');
-
-    document.getElementById('countA').textContent =
-      'Голосов: ' + row.votes_a;
-
-    document.getElementById('countB').textContent =
-      'Голосов: ' + row.votes_b;
-
-    const completed = row.battle_status === 'completed';
-
-    cardA.classList.toggle(
-      'winner',
-      completed && row.winner_meme_id === row.meme_a_id
-    );
-
-    cardB.classList.toggle(
-      'winner',
-      completed && row.winner_meme_id === row.meme_b_id
-    );
-
-    if (completed) {
-      voteA.disabled = true;
-      voteB.disabled = true;
-
-      voteA.textContent = 'Раунд завершён';
-      voteB.textContent = 'Раунд завершён';
-
-      if (row.winner_meme_id === row.meme_a_id) {
-        message.textContent = 'Победил первый мем!';
-      } else if (row.winner_meme_id === row.meme_b_id) {
-        message.textContent = 'Победил второй мем!';
-      } else {
-        message.textContent = 'Ничья!';
-      }
-
-      message.className = 'result-message';
-      return;
-    }
-
-    message.className = '';
-
-    if (row.my_vote) {
-      voteA.disabled = true;
-      voteB.disabled = true;
-
-      voteA.textContent =
-        row.my_vote === row.meme_a_id
-          ? 'Вы выбрали этот мем'
-          : 'Ожидаем результат';
-
-      voteB.textContent =
-        row.my_vote === row.meme_b_id
-          ? 'Вы выбрали этот мем'
-          : 'Ожидаем результат';
-
-      message.textContent =
-        'Твой голос принят! Ждём окончания раунда.';
-    } else {
-      voteA.disabled = false;
-      voteB.disabled = false;
-
-      voteA.textContent = 'Выбрать этот мем';
-      voteB.textContent = 'Выбрать этот мем';
-
-      message.textContent = 'Выбери лучший мем до окончания таймера!';
-    }
-  }
-
-  function updateTimer() {
-    if (!currentBattle) return;
-
-    const endTime = new Date(currentBattle.ends_at).getTime();
-
-    const secondsLeft = Math.max(
-      0,
-      Math.ceil((endTime - Date.now()) / 1000)
-    );
-
-    if (currentBattle.battle_status === 'completed') {
-      timerElement.textContent = secondsLeft + ' сек.';
-      timerElement.classList.remove('urgent');
-      return;
-    }
-
-    timerElement.textContent = secondsLeft + ' сек.';
-    timerElement.classList.toggle('urgent', secondsLeft <= 5);
-
-    if (secondsLeft === 0) {
-      document.getElementById('voteA').disabled = true;
-      document.getElementById('voteB').disabled = true;
-      message.textContent = 'Время вышло! Подсчитываем результаты...';
-    }
-  }
-
-  async function castVote(memeId) {
-    if (!currentBattle) return;
-
-    if (
-      currentBattle.battle_status !== 'active' ||
-      currentBattle.my_vote
-    ) {
-      return;
-    }
-
-    const battleId = currentBattle.battle_id;
-
-    document.getElementById('voteA').disabled = true;
-    document.getElementById('voteB').disabled = true;
-
-    const { error } = await supabaseClient.rpc('cast_battle_vote', {
-      p_battle_id: battleId,
-      p_meme_id: memeId
-    });
-
-    if (error) {
-      message.textContent = 'Не удалось проголосовать: ' + error.message;
-      await refreshBattle();
-      return;
-    }
-
-    currentBattle.my_vote = memeId;
-
-    updateBattleUI();
-    await refreshBattle();
-  }
-
-  document.getElementById('voteA').onclick = () => {
-    if (currentBattle) castVote(currentBattle.meme_a_id);
-  };
-
-  document.getElementById('voteB').onclick = () => {
-    if (currentBattle) castVote(currentBattle.meme_b_id);
-  };
 
   document.getElementById('logoutBtn').onclick = async () => {
     const { error } = await supabaseClient.auth.signOut();
