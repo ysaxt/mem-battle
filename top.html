@@ -3,23 +3,293 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Топ — Mem Battle</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мем Битва — Топ мемов</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Russo+One&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+
   <style>
-    body { background:#f2f6ff; color:#1769e0; font-family:Arial; text-align:center; padding-top:20vh; }
-    h1 { font-size:40px; }
-    a { color:#e53945; font-weight:bold; }
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: #f4f8ff;
+      color: #17233d;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .app {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+      padding: 18px 22px;
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 4px 18px rgba(30,70,130,.07);
+    }
+
+    .logo {
+      font-family: 'Russo One', sans-serif;
+      font-size: 25px;
+      color: #246bdb;
+      text-decoration: none;
+    }
+
+    .nav {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: #53627b;
+      font-weight: 700;
+      padding: 10px 14px;
+      border-radius: 10px;
+    }
+
+    .nav a:hover, .nav a.active {
+      color: #246bdb;
+      background: #eaf2ff;
+    }
+
+    .page-title {
+      margin: 35px 0 10px;
+      font-family: 'Russo One', sans-serif;
+      font-size: 30px;
+    }
+
+    .subtitle {
+      color: #8290a8;
+      margin-bottom: 25px;
+    }
+
+    .top-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .meme-card {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      background: white;
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 5px 22px rgba(30,70,130,.06);
+    }
+
+    .rank {
+      width: 48px;
+      min-width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: #eaf2ff;
+      color: #246bdb;
+      display: grid;
+      place-items: center;
+      font-family: 'Russo One', sans-serif;
+      font-size: 21px;
+    }
+
+    .meme-card:nth-child(1) .rank {
+      background: #fff3d5;
+      color: #d28a00;
+    }
+
+    .meme-card:nth-child(2) .rank {
+      background: #edf0f5;
+      color: #657187;
+    }
+
+    .meme-card:nth-child(3) .rank {
+      background: #ffeadc;
+      color: #bd6a32;
+    }
+
+    .meme-image {
+      width: 135px;
+      height: 105px;
+      object-fit: cover;
+      border-radius: 12px;
+      background: #edf3fc;
+    }
+
+    .meme-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .meme-name {
+      font-weight: 800;
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    .meme-wins {
+      color: #246bdb;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .empty, .error {
+      background: white;
+      border-radius: 18px;
+      padding: 35px 20px;
+      text-align: center;
+      color: #8290a8;
+      box-shadow: 0 5px 22px rgba(30,70,130,.06);
+    }
+
+    .error { color: #e34b4b; }
+
+    .refresh-btn {
+      border: none;
+      border-radius: 11px;
+      padding: 12px 18px;
+      background: #246bdb;
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+
+    .refresh-btn:hover { background: #1558bd; }
+
+    @media (max-width: 600px) {
+      .app { padding: 12px; }
+      .header { padding: 15px; }
+      .page-title { font-size: 25px; }
+      .meme-card { gap: 12px; padding: 12px; }
+      .meme-image { width: 95px; height: 85px; }
+      .rank { width: 38px; min-width: 38px; height: 38px; font-size: 17px; }
+    }
   </style>
 </head>
+
 <body>
-  <h1>Топ</h1>
-  <h2>В РАЗРАБОТКЕ</h2>
-  <a href="index.html">На главную</a>
+  <div class="app">
+    <header class="header">
+      <a href="index.html" class="logo">МЕМ БИТВА</a>
+      <nav class="nav">
+        <a href="index.html">Битвы</a>
+        <a href="submit.html">Отправить мем</a>
+        <a href="top.html" class="active">Топ</a>
+        <a href="profile.html">Профиль</a>
+      </nav>
+    </header>
+
+    <h1 class="page-title">Топ мемов</h1>
+    <p class="subtitle">Самые победоносные мемы Мем Битвы.</p>
+
+    <button class="refresh-btn" id="refreshBtn">Обновить рейтинг</button>
+
+    <div class="top-list" id="topList">
+      <div class="empty">Загружаем рейтинг...</div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
+
   <script>
-    supabaseClient.auth.getSession().then(({data}) => {
-      if (!data.session) location.replace('login.html');
-    });
+    const topList = document.getElementById('topList');
+    const refreshBtn = document.getElementById('refreshBtn');
+
+    async function loadTop() {
+      refreshBtn.disabled = true;
+      refreshBtn.textContent = 'Загрузка...';
+      topList.innerHTML = '<div class="empty">Загружаем рейтинг...</div>';
+
+      try {
+        const { data: memes, error } = await supabaseClient
+          .from('memes')
+          .select('id, image_url, wins, status')
+          .eq('status', 'approved')
+          .order('wins', { ascending: false })
+          .order('created_at', { ascending: true })
+          .limit(50);
+
+        if (error) throw error;
+
+        topList.innerHTML = '';
+
+        if (!memes || memes.length === 0) {
+          topList.innerHTML =
+            '<div class="empty">Пока нет мемов в рейтинге.</div>';
+          return;
+        }
+
+        memes.forEach((meme, index) => {
+          const card = document.createElement('article');
+          card.className = 'meme-card';
+
+          const rank = document.createElement('div');
+          rank.className = 'rank';
+          rank.textContent = index + 1;
+
+          const image = document.createElement('img');
+          image.className = 'meme-image';
+          image.src = meme.image_url;
+          image.alt = 'Мем из рейтинга';
+          image.loading = 'lazy';
+
+          const info = document.createElement('div');
+          info.className = 'meme-info';
+
+          const name = document.createElement('div');
+          name.className = 'meme-name';
+          name.textContent = 'Мем #' + (index + 1);
+
+          const wins = document.createElement('div');
+          wins.className = 'meme-wins';
+          wins.textContent = '🏆 Побед: ' + Number(meme.wins || 0);
+
+          info.appendChild(name);
+          info.appendChild(wins);
+
+          card.appendChild(rank);
+          card.appendChild(image);
+          card.appendChild(info);
+
+          topList.appendChild(card);
+        });
+
+      } catch (error) {
+        topList.innerHTML =
+          '<div class="error">Не удалось загрузить рейтинг: ' +
+          escapeHtml(error.message) + '</div>';
+      } finally {
+        refreshBtn.disabled = false;
+        refreshBtn.textContent = 'Обновить рейтинг';
+      }
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      })[char]);
+    }
+
+    refreshBtn.addEventListener('click', loadTop);
+
+    loadTop();
   </script>
 </body>
 </html>
