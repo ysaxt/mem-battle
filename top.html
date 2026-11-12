@@ -1,0 +1,25 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Топ — Mem Battle</title>
+  <style>
+    body { background:#f2f6ff; color:#1769e0; font-family:Arial; text-align:center; padding-top:20vh; }
+    h1 { font-size:40px; }
+    a { color:#e53945; font-weight:bold; }
+  </style>
+</head>
+<body>
+  <h1>Топ</h1>
+  <h2>В РАЗРАБОТКЕ</h2>
+  <a href="index.html">На главную</a>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <script>
+    supabaseClient.auth.getSession().then(({data}) => {
+      if (!data.session) location.replace('login.html');
+    });
+  </script>
+</body>
+</html>
