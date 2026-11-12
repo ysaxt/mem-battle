@@ -2,896 +2,337 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Мем Битва — Профиль</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль — MEM BATTLE</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Russo+One&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Russo+One&display=swap" rel="stylesheet">
 
-  <style>
-    * { box-sizing: border-box; }
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabaseClient.js"></script>
 
-    body {
-      margin: 0;
-      background: #f4f8ff;
-      color: #17233d;
-      font-family: 'Inter', sans-serif;
-    }
+    <style>
+        * { box-sizing: border-box; }
 
-    .app {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 20px;
-    }
+        body {
+            margin: 0;
+            background: #f2f6ff;
+            color: #172b4d;
+            font-family: 'Inter', sans-serif;
+        }
 
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-      flex-wrap: wrap;
-      padding: 18px 22px;
-      background: white;
-      border-radius: 18px;
-      box-shadow: 0 4px 18px rgba(30,70,130,.07);
-    }
+        header {
+            background: white;
+            border-bottom: 2px solid #dce7ff;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
 
-    .logo {
-      font-family: 'Russo One', sans-serif;
-      font-size: 25px;
-      color: #246bdb;
-      text-decoration: none;
-    }
+        .left-side, .right-side, .navigation {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
 
-    .nav {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+        .logo {
+            font-family: 'Russo One', sans-serif;
+            font-size: 30px;
+            color: #1769e0;
+            white-space: nowrap;
+        }
 
-    .nav a {
-      text-decoration: none;
-      color: #53627b;
-      font-weight: 700;
-      padding: 10px 14px;
-      border-radius: 10px;
-    }
+        .logo span { color: #e53945; }
 
-    .nav a:hover, .nav a.active {
-      color: #246bdb;
-      background: #eaf2ff;
-    }
+        .navigation a {
+            text-decoration: none;
+            color: #71809b;
+            font-weight: 700;
+            transition: .2s;
+        }
 
-    .page-title {
-      margin: 35px 0 20px;
-      font-family: 'Russo One', sans-serif;
-      font-size: 30px;
-    }
+        .navigation a:hover,
+        .navigation a.active {
+            color: #1769e0;
+        }
 
-    .profile-card, .memes-box, .history-box {
-      background: white;
-      border-radius: 20px;
-      padding: 28px;
-      box-shadow: 0 5px 22px rgba(30,70,130,.07);
-      margin-bottom: 20px;
-    }
+        .user-info {
+            text-align: right;
+            font-size: 13px;
+            color: #71809b;
+        }
 
-    .profile-top {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
+        .user-info strong {
+            display: block;
+            color: #172b4d;
+            font-size: 15px;
+        }
 
-    .avatar {
-      width: 78px;
-      height: 78px;
-      border-radius: 20px;
-      background: linear-gradient(135deg, #2f80ed, #70b7ff);
-      color: white;
-      display: grid;
-      place-items: center;
-      font-family: 'Russo One', sans-serif;
-      font-size: 32px;
-    }
+        button, .button {
+            border: none;
+            background: #1769e0;
+            color: white;
+            padding: 11px 18px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+        }
 
-    .username {
-      font-family: 'Russo One', sans-serif;
-      font-size: 25px;
-      margin: 0 0 7px;
-    }
+        button:hover, .button:hover { background: #0e55bd; }
 
-    .user-role {
-      color: #8290a8;
-      font-size: 13px;
-      font-weight: 700;
-    }
+        .logout { background: #e53945; }
 
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 15px;
-      margin-top: 25px;
-    }
+        main {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
 
-    .stat {
-      padding: 20px;
-      background: #f4f8ff;
-      border-radius: 15px;
-    }
+        h1 {
+            font-family: 'Russo One', sans-serif;
+            font-size: 32px;
+            margin-bottom: 25px;
+        }
 
-    .stat-label {
-      color: #77869e;
-      font-size: 13px;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
+        .card {
+            background: white;
+            border: 2px solid #dce7ff;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 18px rgba(23, 105, 224, .05);
+        }
 
-    .stat-value {
-      font-family: 'Russo One', sans-serif;
-      font-size: 27px;
-      color: #246bdb;
-    }
+        .profile-top {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            flex-wrap: wrap;
+        }
 
-    .section-title {
-      font-family: 'Russo One', sans-serif;
-      font-size: 21px;
-      margin: 28px 0 15px;
-    }
+        .avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: #e5efff;
+            color: #1769e0;
+            display: grid;
+            place-items: center;
+            font-size: 35px;
+            font-weight: 800;
+        }
 
-    .meme-item {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      padding: 15px 0;
-      border-bottom: 1px solid #edf1f7;
-    }
+        .profile-name {
+            font-size: 25px;
+            font-weight: 800;
+        }
 
-    .meme-item:last-child { border-bottom: none; }
+        .muted { color: #71809b; }
 
-    .meme-image {
-      width: 110px;
-      height: 90px;
-      object-fit: contain;
-      border-radius: 10px;
-      background: #edf3fc;
-      flex-shrink: 0;
-    }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 25px;
+        }
 
-    .meme-details {
-      min-width: 0;
-      flex: 1;
-    }
+        .stat {
+            background: #f2f6ff;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
 
-    .status {
-      display: inline-block;
-      padding: 7px 11px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 800;
-    }
+        .stat strong {
+            display: block;
+            color: #1769e0;
+            font-size: 25px;
+            margin-bottom: 5px;
+        }
 
-    .status-pending {
-      color: #a66a00;
-      background: #fff5dc;
-    }
+        .items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 18px;
+        }
 
-    .status-approved {
-      color: #16834d;
-      background: #eafff2;
-      border: 1px solid #b8efd0;
-    }
+        .meme {
+            border: 2px solid #dce7ff;
+            border-radius: 14px;
+            overflow: hidden;
+            background: white;
+        }
 
-    .status-rejected {
-      color: #d83c3c;
-      background: #fff0f0;
-      border: 1px solid #ffd0d0;
-    }
+        .meme img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+        }
 
-    .meme-wins {
-      color: #8290a8;
-      font-size: 13px;
-      margin-top: 8px;
-    }
+        .meme-info { padding: 14px; }
 
-    .rejection-reason {
-      color: #d83c3c;
-      background: #fff4f4;
-      border-radius: 9px;
-      padding: 10px;
-      margin-top: 9px;
-      font-size: 13px;
-      line-height: 1.5;
-      overflow-wrap: anywhere;
-    }
+        .empty {
+            color: #71809b;
+            text-align: center;
+            padding: 25px;
+        }
 
-    .empty {
-      color: #8996aa;
-      text-align: center;
-      padding: 25px 10px;
-    }
-
-    .buttons {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 25px;
-    }
-
-    .btn {
-      display: inline-block;
-      border: none;
-      border-radius: 11px;
-      padding: 12px 18px;
-      background: #246bdb;
-      color: white;
-      text-decoration: none;
-      font-weight: 800;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .btn-red { background: #ed5353; }
-
-    .message {
-      margin-top: 15px;
-      color: #ed5353;
-      font-weight: 600;
-    }
-
-    /* История батлов */
-
-    .history-summary {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-
-    .history-stat {
-      padding: 15px;
-      background: #f4f8ff;
-      border-radius: 13px;
-    }
-
-    .history-stat-label {
-      color: #77869e;
-      font-size: 12px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .history-stat-value {
-      font-family: 'Russo One', sans-serif;
-      font-size: 22px;
-      color: #246bdb;
-    }
-
-    .history-item {
-      border: 1px solid #e5edf9;
-      border-radius: 15px;
-      padding: 17px;
-      margin-bottom: 14px;
-    }
-
-    .history-item:last-child { margin-bottom: 0; }
-
-    .history-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 15px;
-    }
-
-    .history-category {
-      color: #8290a8;
-      font-size: 12px;
-      font-weight: 800;
-    }
-
-    .history-date {
-      color: #9aa6b9;
-      font-size: 12px;
-    }
-
-    .history-memes {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .history-meme {
-      min-width: 0;
-      padding: 10px;
-      border: 2px solid #edf1f7;
-      border-radius: 12px;
-      text-align: center;
-    }
-
-    .history-meme.selected {
-      border-color: #246bdb;
-      background: #f3f7ff;
-    }
-
-    .history-meme.winner {
-      border-color: #20a66a;
-      background: #edfff4;
-    }
-
-    .history-meme img {
-      width: 100%;
-      height: 135px;
-      object-fit: contain;
-      border-radius: 8px;
-      background: #f4f8ff;
-    }
-
-    .history-meme-name {
-      margin-top: 8px;
-      font-size: 12px;
-      font-weight: 800;
-      color: #53627b;
-    }
-
-    .history-meme-label {
-      margin-top: 6px;
-      font-size: 11px;
-      font-weight: 800;
-      color: #246bdb;
-    }
-
-    .history-result {
-      margin-top: 14px;
-      padding: 13px;
-      border-radius: 11px;
-      background: #f4f8ff;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
-
-    .result-label {
-      color: #8290a8;
-      font-size: 11px;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-
-    .result-value {
-      font-size: 14px;
-      font-weight: 800;
-      overflow-wrap: anywhere;
-    }
-
-    .result-positive { color: #16834d; }
-    .result-negative { color: #d83c3c; }
-    .result-neutral { color: #246bdb; }
-
-    .history-badge {
-      display: inline-block;
-      padding: 7px 11px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 800;
-    }
-
-    .badge-win {
-      color: #16834d;
-      background: #eafff2;
-    }
-
-    .badge-loss {
-      color: #d83c3c;
-      background: #fff0f0;
-    }
-
-    .badge-draw {
-      color: #a66a00;
-      background: #fff5dc;
-    }
-
-    .badge-pending {
-      color: #246bdb;
-      background: #eaf2ff;
-    }
-
-    @media (max-width: 650px) {
-      .app { padding: 12px; }
-      .header { padding: 15px; }
-      .stats { grid-template-columns: 1fr; }
-      .page-title { font-size: 25px; }
-      .profile-card, .memes-box, .history-box { padding: 20px; }
-      .meme-image { width: 85px; height: 75px; }
-      .history-summary { grid-template-columns: 1fr; }
-      .history-result { grid-template-columns: 1fr 1fr; }
-      .history-meme img { height: 105px; }
-    }
-  </style>
+        @media(max-width: 700px) {
+            header { justify-content: center; }
+            .left-side { flex-direction: column; gap: 15px; }
+            .navigation { gap: 12px; flex-wrap: wrap; justify-content: center; }
+            .right-side { justify-content: center; }
+            .stats { grid-template-columns: 1fr; }
+            h1 { font-size: 25px; }
+        }
+    </style>
 </head>
 
 <body>
-<div class="app">
 
-  <header class="header">
-    <a href="index.html" class="logo">МЕМ БИТВА</a>
+<header>
+    <div class="left-side">
+        <div class="logo">MEM <span>BATTLE</span></div>
 
-    <nav class="nav">
-      <a href="index.html">Битвы</a>
-      <a href="submit.html">Отправить мем</a>
-      <a href="top.html">Топ</a>
-      <a href="profile.html" class="active">Профиль</a>
-    </nav>
-  </header>
-
-  <h1 class="page-title">Мой профиль</h1>
-
-  <section class="profile-card">
-    <div class="profile-top">
-      <div class="avatar" id="avatar">?</div>
-
-      <div>
-        <h2 class="username" id="username">Загрузка...</h2>
-        <div class="user-role" id="userRole">Участник Мем Битвы</div>
-      </div>
+        <nav class="navigation">
+            <a href="index.html">Главная</a>
+            <a href="profile.html" class="active">Профиль</a>
+            <a href="submit.html">Отправить мем</a>
+            <a href="top.html">Топ</a>
+        </nav>
     </div>
 
-    <div class="stats">
-      <div class="stat">
-        <div class="stat-label">Баланс</div>
-        <div class="stat-value" id="coins">—</div>
-      </div>
-
-      <div class="stat">
-        <div class="stat-label">Отправлено мемов</div>
-        <div class="stat-value" id="memesCount">—</div>
-      </div>
-
-      <div class="stat">
-        <div class="stat-label">Победы мемов</div>
-        <div class="stat-value" id="wins">—</div>
-      </div>
+    <div class="right-side">
+        <div class="user-info">
+            <strong id="username">Загрузка...</strong>
+            <span>Баланс: <b id="balance">0</b> 🪙</span>
+        </div>
+        <button class="logout" id="logoutBtn">Выйти</button>
     </div>
+</header>
 
-    <div class="buttons">
-      <a href="submit.html" class="btn">Отправить мем</a>
-      <button class="btn btn-red" id="logoutBtn">Выйти из аккаунта</button>
-    </div>
+<main>
+    <h1>Мой профиль</h1>
 
-    <div class="message" id="message"></div>
-  </section>
+    <section class="card">
+        <div class="profile-top">
+            <div class="avatar" id="avatar">👤</div>
+            <div>
+                <div class="profile-name" id="profileName">Загрузка...</div>
+                <div class="muted" id="profileEmail"></div>
+            </div>
+        </div>
 
-  <h2 class="section-title">История батлов</h2>
+        <div class="stats">
+            <div class="stat">
+                <strong id="balanceStat">0</strong>
+                Баланс
+            </div>
+            <div class="stat">
+                <strong id="memesCount">0</strong>
+                Мемов
+            </div>
+            <div class="stat">
+                <strong id="winsCount">0</strong>
+                Побед
+            </div>
+        </div>
+    </section>
 
-  <section class="history-box">
-    <div class="history-summary">
-      <div class="history-stat">
-        <div class="history-stat-label">Участий</div>
-        <div class="history-stat-value" id="historyTotal">—</div>
-      </div>
-      <div class="history-stat">
-        <div class="history-stat-label">Побед</div>
-        <div class="history-stat-value" id="historyWins">—</div>
-      </div>
-      <div class="history-stat">
-        <div class="history-stat-label">Общий результат</div>
-        <div class="history-stat-value" id="historyProfit">—</div>
-      </div>
-    </div>
-
-    <div id="battleHistory" class="empty">Загрузка истории...</div>
-  </section>
-
-  <h2 class="section-title">Мои мемы</h2>
-
-  <section class="memes-box">
-    <div class="empty" id="myMemes">Загрузка мемов...</div>
-  </section>
-
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js"></script>
+    <section class="card">
+        <h2>Мои мемы</h2>
+        <div class="items" id="myMemes">
+            <p class="empty">Загрузка мемов...</p>
+        </div>
+    </section>
+</main>
 
 <script>
-  const message = document.getElementById('message');
+    const db = window.supabaseClient || window.supabase;
 
-  function escapeHtml(value) {
-    return String(value ?? '').replace(/[&<>"']/g, char => ({
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#039;'
-    })[char]);
-  }
+    async function initProfile() {
+        if (!db) {
+            alert('Не найден клиент Supabase. Проверь supabaseClient.js');
+            return;
+        }
 
-  function formatCoins(value) {
-    return Number(value || 0).toLocaleString('ru-RU');
-  }
+        const { data: { user }, error } = await db.auth.getUser();
 
-  function formatDate(value) {
-    if (!value) return 'Дата неизвестна';
+        if (error || !user) {
+            location.href = 'index.html';
+            return;
+        }
 
-    return new Date(value).toLocaleString('ru-RU', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  }
+        document.getElementById('profileEmail').textContent = user.email || '';
 
-  function categoryName(duration) {
-    const names = {
-      30: '30 секунд',
-      60: '1 минута',
-      180: '3 минуты',
-      300: '5 минут',
-      600: '10 минут',
-      3600: '1 час',
-      86400: '24 часа',
-      604800: '7 дней'
-    };
+        const { data: profile } = await db
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .maybeSingle();
 
-    return names[duration] || 'Батл';
-  }
+        const name = profile?.username || user.email?.split('@')[0] || 'Игрок';
+        const balance = profile?.balance ?? 0;
 
-  async function loadBattleHistory(userId) {
-    const container = document.getElementById('battleHistory');
+        document.getElementById('username').textContent = name;
+        document.getElementById('profileName').textContent = name;
+        document.getElementById('balance').textContent = balance;
+        document.getElementById('balanceStat').textContent = balance;
+        document.getElementById('avatar').textContent = name[0].toUpperCase();
 
-    const { data: votes, error } = await supabaseClient
-      .from('votes')
-      .select(`
-        id,
-        battle_id,
-        meme_id,
-        bet_amount,
-        payout,
-        settled_at,
-        created_at,
-        battles (
-          id,
-          meme_a,
-          meme_b,
-          status,
-          winner_meme_id,
-          duration_seconds,
-          created_at,
-          memes_a:memes!battles_meme_a_fkey (
-            id,
-            image_url
-          ),
-          memes_b:memes!battles_meme_b_fkey (
-            id,
-            image_url
-          )
-        )
-      `)
-      .eq('user_id', userId)
-      .gt('bet_amount', 0)
-      .order('created_at', { ascending: false });
+        const { data: memes, error: memesError } = await db
+            .from('memes')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error('Ошибка истории:', error);
-      container.textContent =
-        'Не удалось загрузить историю батлов: ' + error.message;
-      return;
+        const container = document.getElementById('myMemes');
+
+        if (memesError) {
+            container.innerHTML = '<p class="empty">Не удалось загрузить мемы.</p>';
+            return;
+        }
+
+        document.getElementById('memesCount').textContent = memes?.length || 0;
+
+        if (!memes || memes.length === 0) {
+            container.innerHTML = '<p class="empty">Ты пока не отправил ни одного мема.</p>';
+            return;
+        }
+
+        container.innerHTML = memes.map(meme => {
+            const image = meme.image_url || meme.image || meme.url;
+
+            return `
+                <article class="meme">
+                    ${image ? `<img src="${escapeHtml(image)}" alt="Мем">` : ''}
+                    <div class="meme-info">
+                        <strong>${escapeHtml(meme.title || 'Мой мем')}</strong>
+                    </div>
+                </article>
+            `;
+        }).join('');
     }
 
-    if (!votes || votes.length === 0) {
-      container.textContent = 'Ты пока не участвовал в батлах.';
-      container.className = 'empty';
-
-      document.getElementById('historyTotal').textContent = '0';
-      document.getElementById('historyWins').textContent = '0';
-      document.getElementById('historyProfit').textContent = '0';
-
-      return;
+    function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, char => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;',
+            '"': '&quot;', "'": '&#039;'
+        })[char]);
     }
 
-    let totalProfit = 0;
-    let totalWins = 0;
-    let totalFinished = 0;
-
-    container.className = '';
-
-    const cards = votes.map(vote => {
-      const battle = vote.battles;
-
-      if (!battle) return '';
-
-      const memeA = battle.memes_a;
-      const memeB = battle.memes_b;
-
-      const selectedMeme = vote.meme_id;
-      const winnerMeme = battle.winner_meme_id;
-
-      const isCompleted =
-        battle.status === 'completed' && vote.settled_at;
-
-      const bet = Number(vote.bet_amount || 0);
-      const payout = Number(vote.payout || 0);
-
-      const profit = isCompleted ? payout - bet : 0;
-
-      if (isCompleted) {
-        totalFinished++;
-        totalProfit += profit;
-
-        if (winnerMeme && selectedMeme === winnerMeme) {
-          totalWins++;
-        }
-      }
-
-      let resultText = 'Батл ещё не завершён';
-      let resultClass = 'badge-pending';
-
-      if (isCompleted) {
-        if (!winnerMeme) {
-          resultText = 'Ничья';
-          resultClass = 'badge-draw';
-        } else if (selectedMeme === winnerMeme) {
-          resultText = 'Победа';
-          resultClass = 'badge-win';
-        } else {
-          resultText = 'Поражение';
-          resultClass = 'badge-loss';
-        }
-      }
-
-      let profitClass = 'result-neutral';
-      let profitText = '—';
-
-      if (isCompleted) {
-        profitClass = profit > 0
-          ? 'result-positive'
-          : profit < 0
-            ? 'result-negative'
-            : 'result-neutral';
-
-        profitText = (profit > 0 ? '+' : '') + formatCoins(profit);
-      }
-
-      const selectedLabel = selectedMeme === battle.meme_a
-        ? 'Твой выбор'
-        : 'Твой выбор';
-
-      const winnerA = isCompleted && winnerMeme === battle.meme_a;
-      const winnerB = isCompleted && winnerMeme === battle.meme_b;
-
-      return `
-        <article class="history-item">
-
-          <div class="history-top">
-            <div>
-              <span class="history-category">
-                ${escapeHtml(categoryName(battle.duration_seconds))}
-              </span>
-              <span class="history-badge ${resultClass}">
-                ${resultText}
-              </span>
-            </div>
-
-            <div class="history-date">
-              ${escapeHtml(formatDate(battle.created_at))}
-            </div>
-          </div>
-
-          <div class="history-memes">
-
-            <div class="history-meme ${
-              selectedMeme === battle.meme_a ? 'selected' : ''
-            } ${winnerA ? 'winner' : ''}">
-
-              <img
-                src="${escapeHtml(memeA?.image_url || '')}"
-                alt="Первый мем"
-                loading="lazy"
-              >
-
-              <div class="history-meme-name">Первый мем</div>
-
-              <div class="history-meme-label">
-                ${selectedMeme === battle.meme_a ? 'ТВОЙ ВЫБОР' : ''}
-                ${winnerA ? ' · ПОБЕДИТЕЛЬ' : ''}
-              </div>
-            </div>
-
-            <div class="history-meme ${
-              selectedMeme === battle.meme_b ? 'selected' : ''
-            } ${winnerB ? 'winner' : ''}">
-
-              <img
-                src="${escapeHtml(memeB?.image_url || '')}"
-                alt="Второй мем"
-                loading="lazy"
-              >
-
-              <div class="history-meme-name">Второй мем</div>
-
-              <div class="history-meme-label">
-                ${selectedMeme === battle.meme_b ? 'ТВОЙ ВЫБОР' : ''}
-                ${winnerB ? ' · ПОБЕДИТЕЛЬ' : ''}
-              </div>
-            </div>
-
-          </div>
-
-          <div class="history-result">
-
-            <div>
-              <div class="result-label">Твоя ставка</div>
-              <div class="result-value">
-                ${formatCoins(bet)} монет
-              </div>
-            </div>
-
-            <div>
-              <div class="result-label">Получено</div>
-              <div class="result-value">
-                ${isCompleted ? formatCoins(payout) : '—'} монет
-              </div>
-            </div>
-
-            <div>
-              <div class="result-label">Чистый результат</div>
-              <div class="result-value ${profitClass}">
-                ${profitText} ${isCompleted ? 'монет' : ''}
-              </div>
-            </div>
-
-          </div>
-
-        </article>
-      `;
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+        if (db) await db.auth.signOut();
+        location.href = 'index.html';
     });
 
-    container.innerHTML = cards.join('') ||
-      '<div class="empty">История пока пуста.</div>';
-
-    document.getElementById('historyTotal').textContent =
-      votes.length;
-
-    document.getElementById('historyWins').textContent =
-      totalWins;
-
-    document.getElementById('historyProfit').textContent =
-      (totalProfit > 0 ? '+' : '') + formatCoins(totalProfit);
-  }
-
-  async function loadProfile() {
-    const { data: authData, error: authError } =
-      await supabaseClient.auth.getUser();
-
-    if (authError || !authData.user) {
-      message.textContent = 'Войди в аккаунт, чтобы посмотреть профиль.';
-      document.getElementById('username').textContent = 'Гость';
-      document.getElementById('myMemes').textContent =
-        'Войди в аккаунт, чтобы увидеть свои мемы.';
-      document.getElementById('battleHistory').textContent =
-        'Войди в аккаунт, чтобы увидеть историю батлов.';
-      return;
-    }
-
-    const user = authData.user;
-
-    const { data: profile, error: profileError } = await supabaseClient
-      .from('profiles')
-      .select('username, coins, role')
-      .eq('id', user.id)
-      .single();
-
-    if (profileError || !profile) {
-      message.textContent = 'Не удалось загрузить профиль.';
-      return;
-    }
-
-    document.getElementById('username').textContent =
-      profile.username || 'Игрок';
-
-    document.getElementById('avatar').textContent =
-      (profile.username || '?').charAt(0).toUpperCase();
-
-    document.getElementById('coins').textContent =
-      formatCoins(profile.coins);
-
-    document.getElementById('userRole').textContent =
-      profile.role === 'admin' ? 'Администратор' : 'Участник Мем Битвы';
-
-    const { data: memes, error: memesError } = await supabaseClient
-      .from('memes')
-      .select('id, image_url, status, wins, created_at, rejection_reason')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
-
-    if (memesError) {
-      document.getElementById('myMemes').textContent =
-        'Не удалось загрузить мемы.';
-      console.error(memesError);
-      return;
-    }
-
-    const totalWins = (memes || []).reduce(
-      (sum, meme) => sum + Number(meme.wins || 0), 0
-    );
-
-    document.getElementById('memesCount').textContent = memes.length;
-    document.getElementById('wins').textContent = totalWins;
-
-    const container = document.getElementById('myMemes');
-
-    if (memes.length === 0) {
-      container.textContent = 'Ты пока не отправил ни одного мема.';
-    } else {
-      container.replaceChildren();
-
-      memes.forEach(meme => {
-        const item = document.createElement('div');
-        item.className = 'meme-item';
-
-        const img = document.createElement('img');
-        img.className = 'meme-image';
-        img.src = meme.image_url;
-        img.alt = 'Мой мем';
-        img.loading = 'lazy';
-
-        const details = document.createElement('div');
-        details.className = 'meme-details';
-
-        const statusNames = {
-          pending: 'На проверке',
-          approved: 'Одобрен',
-          rejected: 'Отклонён'
-        };
-
-        const status = document.createElement('span');
-        status.className = 'status status-' + (
-          ['pending', 'approved', 'rejected'].includes(meme.status)
-            ? meme.status
-            : 'pending'
-        );
-        status.textContent = statusNames[meme.status] || 'Неизвестный статус';
-
-        const wins = document.createElement('div');
-        wins.className = 'meme-wins';
-        wins.textContent = 'Побед: ' + Number(meme.wins || 0);
-
-        details.append(status, wins);
-
-        if (meme.status === 'rejected') {
-          const reason = document.createElement('div');
-          reason.className = 'rejection-reason';
-          reason.textContent =
-            'Причина отклонения: ' +
-            (meme.rejection_reason || 'Причина не указана');
-
-          details.appendChild(reason);
-        }
-
-        item.append(img, details);
-        container.appendChild(item);
-      });
-    }
-
-    await loadBattleHistory(user.id);
-  }
-
-  document.getElementById('logoutBtn').addEventListener('click', async () => {
-    const { error } = await supabaseClient.auth.signOut();
-
-    if (error) {
-      message.textContent = 'Не удалось выйти из аккаунта.';
-      return;
-    }
-
-    window.location.href = 'index.html';
-  });
-
-  loadProfile();
+    initProfile();
 </script>
 
 </body>
