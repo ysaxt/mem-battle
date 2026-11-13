@@ -1,1032 +1,884 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Профиль — MEM BATTLE</title>
+  <title>Мем Битва — Профиль</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Russo+One&display=swap" rel="stylesheet">
 
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
-      min-height: 100vh;
       background: #f2f6ff;
-      font-family: 'Inter', Arial, sans-serif;
-      color: #172b4d;
+      color: #172033;
+      font-family: 'Inter', sans-serif;
     }
 
-    header {
-      min-height: 105px;
+    button, a {
+      font: inherit;
+    }
+
+    .header {
       background: white;
-      border-bottom: 2px solid #dce7ff;
-      padding: 20px 5%;
+      padding: 16px 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.05);
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 25px;
+      align-items: center;
+      gap: 16px;
       flex-wrap: wrap;
-    }
-
-    .left-side {
-      display: flex;
-      flex-direction: column;
     }
 
     .logo {
       font-family: 'Russo One', sans-serif;
-      font-size: 32px;
-      text-decoration: none;
+      font-size: 23px;
       color: #1769e0;
-      letter-spacing: 1px;
-    }
-
-    .logo span { color: #e53945; }
-
-    .navigation {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 15px;
-    }
-
-    .navigation a {
       text-decoration: none;
-      color: #31517e;
-      background: #f2f6ff;
-      padding: 11px 17px;
-      border-radius: 9px;
-      font-weight: 700;
-      font-size: 14px;
-      transition: 0.2s;
     }
 
-    .navigation a:hover,
-    .navigation a.active {
-      background: #1769e0;
-      color: white;
-    }
-
-    .right-side {
+    .nav {
       display: flex;
-      align-items: center;
       gap: 18px;
       flex-wrap: wrap;
     }
 
-    .user-info { text-align: right; }
-
-    .username {
-      font-weight: 800;
-      font-size: 16px;
-      color: #1769e0;
-    }
-
-    .balance {
-      margin-top: 5px;
-      font-size: 14px;
-      color: #71809b;
-    }
-
-    .balance span {
-      color: #e53945;
-      font-weight: 800;
-    }
-
-    .logout {
-      border: none;
-      background: #e53945;
-      color: white;
-      padding: 12px 19px;
-      border-radius: 9px;
+    .nav a {
+      color: #536078;
+      text-decoration: none;
       font-weight: 700;
-      cursor: pointer;
-      transition: 0.2s;
+      font-size: 14px;
     }
 
-    .logout:hover { background: #c62835; }
-
-    main {
-      max-width: 1100px;
-      margin: 40px auto;
-      padding: 0 25px;
-    }
-
-    .page-heading {
-      text-align: center;
-      margin-bottom: 35px;
-    }
-
-    .page-heading h1 {
-      font-family: 'Russo One', sans-serif;
+    .nav a.active,
+    .nav a:hover {
       color: #1769e0;
-      font-size: 36px;
-      margin: 0 0 10px;
     }
 
-    .page-heading h1 span { color: #e53945; }
-
-    .page-heading p {
-      color: #71809b;
-      margin: 0;
-    }
-
-    .card {
-      background: white;
-      border: 2px solid #dce7ff;
-      border-radius: 16px;
-      padding: 25px;
-      margin-bottom: 25px;
-      box-shadow: 0 7px 25px rgba(30, 80, 160, 0.06);
-    }
-
-    .card h2 {
-      font-family: 'Russo One', sans-serif;
-      color: #1769e0;
-      font-size: 23px;
-      margin: 0 0 20px;
-    }
-
-    .profile-top {
+    .header-user {
       display: flex;
       align-items: center;
-      gap: 22px;
-      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .logout-btn {
+      border: none;
+      background: #fff0f0;
+      color: #e53945;
+      padding: 9px 13px;
+      border-radius: 9px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 30px auto;
+      padding: 0 18px 50px;
+    }
+
+    .profile-card {
+      background: white;
+      border-radius: 18px;
+      padding: 25px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      box-shadow: 0 4px 18px rgba(30,60,100,.06);
+      margin-bottom: 22px;
     }
 
     .avatar {
-      width: 90px;
-      height: 90px;
-      flex-shrink: 0;
+      width: 76px;
+      height: 76px;
       border-radius: 50%;
-      background: #eaf2ff;
-      color: #1769e0;
-      display: grid;
-      place-items: center;
-      font-size: 35px;
-      font-weight: 800;
-      border: 2px solid #dce7ff;
+      background: #1769e0;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Russo One', sans-serif;
+      font-size: 30px;
+      flex-shrink: 0;
     }
 
-    .profile-name {
+    .profile-info h1 {
+      margin: 0 0 6px;
+      font-family: 'Russo One', sans-serif;
       font-size: 25px;
-      font-weight: 800;
-      color: #1769e0;
-      overflow-wrap: anywhere;
     }
 
-    .muted {
-      color: #71809b;
-      margin-top: 6px;
+    .profile-info p {
+      margin: 0;
+      color: #8290a8;
       font-size: 14px;
       overflow-wrap: anywhere;
     }
 
-    /* Статистика */
+    .balance {
+      margin-left: auto;
+      text-align: right;
+    }
+
+    .balance-label {
+      color: #8290a8;
+      font-size: 13px;
+      margin-bottom: 5px;
+    }
+
+    .balance-value {
+      color: #1769e0;
+      font-family: 'Russo One', sans-serif;
+      font-size: 25px;
+    }
 
     .stats {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 15px;
-      margin-top: 25px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 30px;
     }
 
-    .stat {
-      background: #f2f6ff;
-      border: 1px solid #dce7ff;
-      padding: 20px;
-      border-radius: 12px;
-      text-align: center;
-      color: #71809b;
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .stat strong {
-      display: block;
-      color: #1769e0;
-      font-size: 27px;
-      margin-bottom: 5px;
-      overflow-wrap: anywhere;
-    }
-
-    .stat.green strong { color: #20a66a; }
-    .stat.red strong { color: #e53945; }
-
-    /* Мемы */
-
-    .items {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 18px;
-    }
-
-    .meme {
-      border: 2px solid #dce7ff;
-      border-radius: 14px;
-      overflow: hidden;
+    .stat-card {
       background: white;
-      transition: 0.2s;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 18px rgba(30,60,100,.05);
+    }
+
+    .stat-label {
+      color: #8290a8;
+      font-size: 13px;
+      margin-bottom: 9px;
+    }
+
+    .stat-value {
+      font-family: 'Russo One', sans-serif;
+      font-size: 25px;
+      color: #1769e0;
+    }
+
+    .stat-value.green {
+      color: #16a36a;
+    }
+
+    .stat-value.red {
+      color: #e53945;
+    }
+
+    .section {
+      margin-top: 30px;
+    }
+
+    .section-title {
+      font-family: 'Russo One', sans-serif;
+      font-size: 22px;
+      margin: 0 0 16px;
+    }
+
+    .memes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 16px;
+    }
+
+    .meme-card {
+      background: white;
+      border-radius: 14px;
+      padding: 12px;
+      box-shadow: 0 4px 15px rgba(30,60,100,.05);
       min-width: 0;
     }
 
-    .meme:hover {
-      border-color: #1769e0;
-      transform: translateY(-2px);
-    }
-
-    .meme img {
+    .meme-card img {
       width: 100%;
       height: 190px;
       object-fit: contain;
-      display: block;
-      background: #f8faff;
+      background: #f4f6fa;
+      border-radius: 9px;
     }
 
     .meme-info {
-      padding: 14px;
-    }
-
-    .meme-info strong {
-      color: #31517e;
-      overflow-wrap: anywhere;
-    }
-
-    .meme-info p {
-      color: #71809b;
+      padding: 10px 2px 2px;
       font-size: 13px;
-      margin: 7px 0 0;
+      color: #65728a;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
     }
 
-    .meme-status {
-      display: inline-block;
-      margin-top: 9px;
-      padding: 5px 9px;
-      border-radius: 7px;
-      background: #f2f6ff;
-      color: #71809b;
-      font-size: 11px;
-      font-weight: 800;
+    .status {
+      font-weight: 700;
     }
 
-    .meme-status.approved {
-      color: #168653;
-      background: #eafff2;
+    .status.approved {
+      color: #16a36a;
     }
 
-    .meme-status.rejected {
-      color: #c62835;
-      background: #fff0f1;
+    .status.pending {
+      color: #d99516;
     }
 
-    /* История батлов */
+    .status.rejected {
+      color: #e53945;
+    }
 
     .history-list {
       display: flex;
       flex-direction: column;
-      gap: 13px;
-    }
-
-    .history-item {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 15px;
-      align-items: center;
-      padding: 16px;
-      border: 2px solid #e5edff;
-      border-radius: 13px;
-      background: white;
-      min-width: 0;
-    }
-
-    .history-item.win {
-      border-left: 5px solid #20a66a;
-    }
-
-    .history-item.loss {
-      border-left: 5px solid #e53945;
-    }
-
-    .history-item.draw {
-      border-left: 5px solid #e5a52b;
-    }
-
-    .history-item.pending {
-      border-left: 5px solid #1769e0;
-    }
-
-    .history-main {
-      min-width: 0;
-    }
-
-    .history-category {
-      color: #71809b;
-      font-size: 12px;
-      font-weight: 800;
-      margin-bottom: 10px;
-    }
-
-    .history-memes {
-      display: flex;
-      align-items: center;
       gap: 12px;
-      min-width: 0;
     }
 
-    .history-meme {
+    .history-card {
+      background: white;
+      border-radius: 14px;
+      padding: 15px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 15px;
+      box-shadow: 0 4px 15px rgba(30,60,100,.05);
       min-width: 0;
-      flex: 1;
     }
 
-    .history-meme img {
-      width: 58px;
-      height: 58px;
+    .history-images {
+      display: flex;
+      align-items: center;
+      gap: 7px;
       flex-shrink: 0;
-      object-fit: contain;
-      border-radius: 8px;
-      background: #f2f6ff;
-      border: 1px solid #dce7ff;
     }
 
-    .history-meme span {
-      font-size: 12px;
-      font-weight: 700;
-      color: #31517e;
-      overflow-wrap: anywhere;
+    .history-images img {
+      width: 76px;
+      height: 76px;
+      object-fit: contain;
+      background: #f4f6fa;
+      border-radius: 9px;
     }
 
     .history-vs {
-      color: #e53945;
+      color: #9aa5b7;
       font-family: 'Russo One', sans-serif;
-      font-size: 13px;
-      flex-shrink: 0;
+      font-size: 12px;
+    }
+
+    .history-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .history-opponent {
+      font-weight: 800;
+      font-size: 14px;
+      margin-bottom: 6px;
     }
 
     .history-date {
-      color: #9aa8c0;
-      font-size: 11px;
-      margin-top: 10px;
+      color: #8995a9;
+      font-size: 12px;
+      margin-bottom: 7px;
     }
 
     .history-result {
-      text-align: right;
-      flex-shrink: 0;
-    }
-
-    .result-label {
-      display: inline-block;
-      padding: 7px 11px;
-      border-radius: 8px;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 800;
+    }
+
+    .history-result.win {
+      color: #16a36a;
+    }
+
+    .history-result.loss {
+      color: #e53945;
+    }
+
+    .history-result.draw {
+      color: #8995a9;
+    }
+
+    .history-money {
+      font-family: 'Russo One', sans-serif;
+      font-size: 17px;
       white-space: nowrap;
+      margin-left: auto;
     }
 
-    .result-label.win {
-      color: #168653;
-      background: #eafff2;
+    .history-money.positive {
+      color: #16a36a;
     }
 
-    .result-label.loss {
-      color: #c62835;
-      background: #fff0f1;
+    .history-money.negative {
+      color: #e53945;
     }
 
-    .result-label.draw {
-      color: #a66a00;
-      background: #fff7e5;
+    .history-money.neutral {
+      color: #8995a9;
     }
-
-    .result-label.pending {
-      color: #1769e0;
-      background: #eaf2ff;
-    }
-
-    .money-result {
-      margin-top: 8px;
-      font-size: 15px;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-
-    .money-result.positive { color: #20a66a; }
-    .money-result.negative { color: #e53945; }
-    .money-result.neutral { color: #71809b; }
 
     .empty {
-      color: #71809b;
+      background: white;
+      padding: 28px 18px;
+      border-radius: 14px;
+      color: #8995a9;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .loading {
+      color: #8995a9;
       text-align: center;
       padding: 25px;
-      grid-column: 1 / -1;
-      margin: 0;
-    }
-
-    .section-subtitle {
-      color: #71809b;
-      font-size: 13px;
-      margin: -10px 0 20px;
-    }
-
-    @media (max-width: 850px) {
-      main { max-width: 100%; }
     }
 
     @media (max-width: 650px) {
-      .stats {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+      .header {
+        padding: 14px;
       }
 
-      .history-item {
-        grid-template-columns: 1fr;
+      .logo {
+        font-size: 20px;
+      }
+
+      .nav {
+        order: 3;
+        width: 100%;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .nav a {
+        font-size: 12px;
+      }
+
+      .header-user {
+        font-size: 12px;
+      }
+
+      .container {
+        margin-top: 18px;
+        padding: 0 12px 35px;
+      }
+
+      .profile-card {
+        padding: 17px;
+        gap: 12px;
+      }
+
+      .avatar {
+        width: 58px;
+        height: 58px;
+        font-size: 23px;
+      }
+
+      .profile-info h1 {
+        font-size: 19px;
+      }
+
+      .profile-info p {
+        font-size: 11px;
+      }
+
+      .balance-value {
+        font-size: 19px;
+      }
+
+      .balance-label {
+        font-size: 11px;
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+
+      .stat-card {
+        padding: 14px;
+      }
+
+      .stat-label {
+        font-size: 11px;
+      }
+
+      .stat-value {
+        font-size: 21px;
+      }
+
+      .section-title {
+        font-size: 19px;
+      }
+
+      .history-card {
+        padding: 10px;
+        gap: 9px;
+      }
+
+      .history-images {
+        gap: 4px;
+      }
+
+      .history-images img {
+        width: 55px;
+        height: 60px;
+      }
+
+      .history-vs {
+        font-size: 10px;
+      }
+
+      .history-opponent {
+        font-size: 12px;
+      }
+
+      .history-date {
+        font-size: 10px;
       }
 
       .history-result {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        text-align: left;
-        gap: 10px;
+        font-size: 11px;
       }
 
-      .money-result { margin-top: 0; }
-    }
-
-    @media (max-width: 550px) {
-      header { align-items: flex-start; }
-
-      .right-side {
-        width: 100%;
-        justify-content: space-between;
+      .history-money {
+        font-size: 13px;
       }
-
-      .navigation { gap: 7px; }
-
-      .navigation a {
-        padding: 9px 10px;
-        font-size: 12px;
-      }
-
-      main {
-        padding: 0 12px;
-        margin-top: 28px;
-      }
-
-      .page-heading h1 { font-size: 28px; }
-
-      .card { padding: 16px; }
-      .card h2 { font-size: 20px; }
-      .profile-name { font-size: 21px; }
-
-      .stats {
-        gap: 10px;
-      }
-
-      .stat {
-        padding: 15px 8px;
-        font-size: 12px;
-      }
-
-      .stat strong { font-size: 23px; }
-
-      .items {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10px;
-      }
-
-      .meme img { height: 145px; }
-      .meme-info { padding: 10px; }
-
-      .history-item { padding: 12px; }
-      .history-memes { gap: 7px; }
-      .history-meme { gap: 5px; }
-
-      .history-meme img {
-        width: 44px;
-        height: 44px;
-      }
-
-      .history-meme span { font-size: 10px; }
-      .history-vs { font-size: 11px; }
-    }
-
-    @media (max-width: 350px) {
-      .items { grid-template-columns: 1fr; }
-      .stats { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 
 <body>
 
-<header>
-  <div class="left-side">
-    <a href="index.html" class="logo">MEM <span>BATTLE</span></a>
+<header class="header">
+  <a href="index.html" class="logo">МЕМ БИТВА</a>
 
-    <nav class="navigation">
-      <a href="index.html">Главная</a>
-      <a href="profile.html" class="active">Профиль</a>
-      <a href="submit.html">Отправить мем</a>
-      <a href="top.html">Топ</a>
-    </nav>
-  </div>
+  <nav class="nav">
+    <a href="index.html">Битвы</a>
+    <a href="profile.html" class="active">Профиль</a>
+    <a href="submit.html">Загрузить мем</a>
+    <a href="top.html">Топ</a>
+  </nav>
 
-  <div class="right-side">
-    <div class="user-info">
-      <div class="username" id="username">Загрузка...</div>
-      <div class="balance">Баланс: <span id="balance">...</span></div>
-    </div>
-
-    <button class="logout" id="logoutBtn">Выйти</button>
+  <div class="header-user">
+    <span id="headerUsername">Загрузка...</span>
+    <button class="logout-btn" id="logoutBtn">Выйти</button>
   </div>
 </header>
 
-<main>
-  <div class="page-heading">
-    <h1>МОЙ <span>ПРОФИЛЬ</span></h1>
-    <p>Твоя статистика, мемы и история батлов</p>
-  </div>
+<main class="container">
 
-  <section class="card">
-    <div class="profile-top">
-      <div class="avatar" id="avatar">👤</div>
+  <section class="profile-card">
+    <div class="avatar" id="avatar">?</div>
 
-      <div>
-        <div class="profile-name" id="profileName">Загрузка...</div>
-        <div class="muted" id="profileEmail"></div>
-      </div>
+    <div class="profile-info">
+      <h1 id="username">Загрузка...</h1>
+      <p id="email"></p>
     </div>
 
-    <div class="stats">
-      <div class="stat">
-        <strong id="balanceStat">0</strong>
-        Баланс
-      </div>
-
-      <div class="stat">
-        <strong id="memesCount">0</strong>
-        Моих мемов загружено
-      </div>
-
-      <div class="stat">
-        <strong id="winsCount">0</strong>
-        Победы моих мемов
-      </div>
-
-      <div class="stat">
-        <strong id="battlesCount">0</strong>
-        Сыграно батлов
-      </div>
-
-      <div class="stat green">
-        <strong id="coinsWon">0</strong>
-        Выиграно монет
-      </div>
-
-      <div class="stat red">
-        <strong id="coinsLost">0</strong>
-        Проиграно монет
-      </div>
+    <div class="balance">
+      <div class="balance-label">Баланс</div>
+      <div class="balance-value" id="balanceStat">0</div>
     </div>
   </section>
 
-  <section class="card">
-    <h2>Мои мемы</h2>
-    <p class="section-subtitle">Все мемы, которые ты отправил на сайт</p>
+  <section class="stats">
+    <div class="stat-card">
+      <div class="stat-label">Моих мемов загружено</div>
+      <div class="stat-value" id="memesCount">0</div>
+    </div>
 
-    <div class="items" id="myMemes">
-      <p class="empty">Загрузка мемов...</p>
+    <div class="stat-card">
+      <div class="stat-label">Победы моих мемов</div>
+      <div class="stat-value green" id="winsCount">0</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Сыграно батлов</div>
+      <div class="stat-value" id="battlesCount">0</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Выиграно монет</div>
+      <div class="stat-value green" id="coinsWon">0</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Проиграно монет</div>
+      <div class="stat-value red" id="coinsLost">0</div>
     </div>
   </section>
 
-  <section class="card">
-    <h2>История батлов</h2>
-    <p class="section-subtitle">
-      Все батлы, в которых ты принимал участие
-    </p>
+  <section class="section">
+    <h2 class="section-title">Мои мемы</h2>
+    <div class="memes-grid" id="myMemes">
+      <div class="loading">Загрузка мемов...</div>
+    </div>
+  </section>
 
+  <section class="section">
+    <h2 class="section-title">История батлов</h2>
     <div class="history-list" id="battleHistory">
-      <p class="empty">Загрузка истории...</p>
+      <div class="loading">Загрузка истории...</div>
     </div>
   </section>
+
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 
 <script>
-const db = supabaseClient;
+  const supabase = window.supabaseClient;
 
-function escapeHtml(value) {
-  return String(value ?? '').replace(/[&<>"']/g, char => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#039;'
-  })[char]);
-}
-
-function formatNumber(value) {
-  return Number(value || 0).toLocaleString('ru-RU');
-}
-
-function formatDate(value) {
-  if (!value) return 'Дата неизвестна';
-
-  return new Date(value).toLocaleString('ru-RU', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-}
-
-function getCategoryName(duration) {
-  const categories = {
-    30: '30 секунд',
-    60: '1 минута',
-    180: '3 минуты',
-    300: '5 минут',
-    600: '10 минут',
-    3600: '1 час',
-    86400: '24 часа',
-    604800: '7 дней'
-  };
-
-  return categories[Number(duration)] || 'Батл';
-}
-
-function setStat(id, value) {
-  document.getElementById(id).textContent = formatNumber(value);
-}
-
-// Загружаем мемы пользователя
-async function loadMyMemes(userId) {
-  const container = document.getElementById('myMemes');
-
-  const { data: memes, error } = await db
-    .from('memes')
-    .select('id, image_url, wins, status, created_at, rejection_reason')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    console.error('Ошибка загрузки мемов:', error);
-    container.innerHTML =
-      '<p class="empty">Не удалось загрузить мемы.</p>';
-    return [];
+  function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, char => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    })[char]);
   }
 
-  const list = memes || [];
-
-  setStat('memesCount', list.length);
-
-  const totalWins = list.reduce(
-    (sum, meme) => sum + Number(meme.wins || 0),
-    0
-  );
-
-  setStat('winsCount', totalWins);
-
-  if (list.length === 0) {
-    container.innerHTML =
-      '<p class="empty">Ты пока не отправил ни одного мема.</p>';
-    return list;
+  function formatNumber(value) {
+    return Number(value || 0).toLocaleString('ru-RU');
   }
 
-  container.innerHTML = list.map(meme => {
-    let statusText = 'На модерации';
-    let statusClass = '';
+  function formatDate(value) {
+    if (!value) return 'Дата неизвестна';
 
-    if (meme.status === 'approved') {
-      statusText = 'Одобрен';
-      statusClass = 'approved';
-    } else if (meme.status === 'rejected') {
-      statusText = 'Отклонён';
-      statusClass = 'rejected';
+    return new Date(value).toLocaleString('ru-RU', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  function setStat(id, value) {
+    const element = document.getElementById(id);
+    if (element) element.textContent = formatNumber(value);
+  }
+
+  function getStatusName(status) {
+    const statuses = {
+      approved: 'Одобрен',
+      pending: 'На модерации',
+      rejected: 'Отклонён'
+    };
+
+    return statuses[status] || status || 'Неизвестно';
+  }
+
+  function getStatusClass(status) {
+    if (status === 'approved') return 'approved';
+    if (status === 'rejected') return 'rejected';
+    return 'pending';
+  }
+
+  async function loadMyMemes(userId) {
+    const container = document.getElementById('myMemes');
+
+    const { data: memes, error } = await supabase
+      .from('memes')
+      .select('id,image_url,wins,status,created_at,rejection_reason')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Ошибка загрузки мемов:', error);
+      container.innerHTML = '<div class="empty">Не удалось загрузить мемы</div>';
+      return;
     }
 
-    return `
-      <article class="meme">
-        ${
-          meme.image_url
-            ? `<img src="${escapeHtml(meme.image_url)}" alt="Мем">`
-            : ''
-        }
+    memes = memes || [];
+
+    setStat('memesCount', memes.length);
+
+    const totalWins = memes.reduce(
+      (sum, meme) => sum + Number(meme.wins || 0),
+      0
+    );
+
+    setStat('winsCount', totalWins);
+
+    if (!memes.length) {
+      container.innerHTML = '<div class="empty">Ты пока не загрузил ни одного мема</div>';
+      return;
+    }
+
+    container.innerHTML = memes.map(meme => `
+      <article class="meme-card">
+        <img
+          src="${escapeHtml(meme.image_url)}"
+          alt="Мем"
+          loading="lazy"
+        >
 
         <div class="meme-info">
-          <strong>Побед: ${Number(meme.wins || 0)}</strong>
-
-          <p>Загружен: ${formatDate(meme.created_at)}</p>
-
-          <span class="meme-status ${statusClass}">
-            ${statusText}
+          <span>Побед: ${formatNumber(meme.wins)}</span>
+          <span class="status ${getStatusClass(meme.status)}">
+            ${escapeHtml(getStatusName(meme.status))}
           </span>
-
-          ${
-            meme.rejection_reason
-              ? `<p>${escapeHtml(meme.rejection_reason)}</p>`
-              : ''
-          }
         </div>
+
+        ${meme.rejection_reason ? `
+          <div style="font-size:12px;color:#e53945;padding:5px 2px;">
+            Причина: ${escapeHtml(meme.rejection_reason)}
+          </div>
+        ` : ''}
       </article>
-    `;
-  }).join('');
-
-  return list;
-}
-
-// Загружаем историю батлов пользователя
-async function loadBattleHistory(userId) {
-  const container = document.getElementById('battleHistory');
-
-  const { data: votes, error: votesError } = await db
-    .from('votes')
-    .select('id, battle_id, meme_id, bet_amount, payout, settled_at, created_at')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false });
-
-  if (votesError) {
-    console.error('Ошибка загрузки голосов:', votesError);
-    container.innerHTML =
-      '<p class="empty">Не удалось загрузить историю батлов.</p>';
-    return;
+    `).join('');
   }
 
-  const voteList = votes || [];
+  async function loadBattleHistory(userId) {
+    const container = document.getElementById('battleHistory');
 
-  // Считаем уникальные батлы, в которых участвовал пользователь
-  const uniqueBattleIds = [
-    ...new Set(voteList.map(vote => vote.battle_id))
-  ];
+    const { data: votes, error: votesError } = await supabase
+      .from('votes')
+      .select('id,battle_id,meme_id,bet_amount,payout,settled_at,created_at')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
 
-  setStat('battlesCount', uniqueBattleIds.length);
-
-  if (uniqueBattleIds.length === 0) {
-    container.innerHTML =
-      '<p class="empty">Ты пока не участвовал в батлах.</p>';
-
-    setStat('coinsWon', 0);
-    setStat('coinsLost', 0);
-    return;
-  }
-
-  // Загружаем информацию о батлах
-  const { data: battles, error: battlesError } = await db
-    .from('battles')
-    .select('id, meme_a, meme_b, winner_meme_id, status, duration_seconds, created_at')
-    .in('id', uniqueBattleIds);
-
-  if (battlesError) {
-    console.error('Ошибка загрузки батлов:', battlesError);
-    container.innerHTML =
-      '<p class="empty">Не удалось загрузить информацию о батлах.</p>';
-    return;
-  }
-
-  const battleMap = new Map(
-    (battles || []).map(battle => [battle.id, battle])
-  );
-
-  // Загружаем изображения всех мемов из истории
-  const memeIds = [
-    ...new Set(
-      (battles || []).flatMap(battle => [
-        battle.meme_a,
-        battle.meme_b
-      ])
-    )
-  ];
-
-  const { data: memes, error: memesError } = await db
-    .from('memes')
-    .select('id, image_url')
-    .in('id', memeIds);
-
-  if (memesError) {
-    console.error('Ошибка загрузки изображений:', memesError);
-  }
-
-  const memeMap = new Map(
-    (memes || []).map(meme => [meme.id, meme])
-  );
-
-  // Считаем чистый результат ставок.
-  // payout включает возвращённую ставку.
-  let totalWon = 0;
-  let totalLost = 0;
-
-  voteList.forEach(vote => {
-    if (!vote.settled_at) return;
-
-    const bet = Number(vote.bet_amount || 0);
-    const payout = Number(vote.payout || 0);
-    const difference = payout - bet;
-
-    if (difference > 0) {
-      totalWon += difference;
-    } else if (difference < 0) {
-      totalLost += Math.abs(difference);
+    if (votesError) {
+      console.error('Ошибка загрузки голосов:', votesError);
+      container.innerHTML = '<div class="empty">Не удалось загрузить историю</div>';
+      return;
     }
-  });
 
-  setStat('coinsWon', totalWon);
-  setStat('coinsLost', totalLost);
+    const voteList = votes || [];
 
-  // Формируем историю
-  const history = voteList.map(vote => {
-    const battle = battleMap.get(vote.battle_id);
+    if (!voteList.length) {
+      setStat('battlesCount', 0);
+      setStat('coinsWon', 0);
+      setStat('coinsLost', 0);
+      container.innerHTML = '<div class="empty">Ты пока не участвовал в батлах</div>';
+      return;
+    }
 
-    if (!battle) return null;
+    const battleIds = [...new Set(voteList.map(vote => vote.battle_id))];
 
-    const selectedMeme = memeMap.get(vote.meme_id);
+    const { data: battles, error: battlesError } = await supabase
+      .from('battles')
+      .select('id,meme_a,meme_b,winner_meme_id,status,duration_seconds,created_at')
+      .in('id', battleIds);
 
-    const opponentId = vote.meme_id === battle.meme_a
-      ? battle.meme_b
-      : battle.meme_a;
+    if (battlesError) {
+      console.error('Ошибка загрузки батлов:', battlesError);
+      container.innerHTML = '<div class="empty">Не удалось загрузить историю батлов</div>';
+      return;
+    }
 
-    const opponentMeme = memeMap.get(opponentId);
+    const battleMap = new Map((battles || []).map(battle => [battle.id, battle]));
 
-    let result = 'pending';
-    let resultText = 'В процессе';
+    // В истории оставляем только завершённые батлы.
+    const completedVotes = voteList.filter(vote => {
+      const battle = battleMap.get(vote.battle_id);
+      return battle && battle.status === 'completed';
+    });
 
-    if (battle.status === 'completed') {
+    const completedBattleIds = new Set(
+      completedVotes.map(vote => vote.battle_id)
+    );
+
+    setStat('battlesCount', completedBattleIds.size);
+
+    if (!completedVotes.length) {
+      setStat('coinsWon', 0);
+      setStat('coinsLost', 0);
+      container.innerHTML = '<div class="empty">Завершённых батлов пока нет</div>';
+      return;
+    }
+
+    const memeIds = [
+      ...new Set(
+        completedVotes.flatMap(vote => {
+          const battle = battleMap.get(vote.battle_id);
+          return battle ? [battle.meme_a, battle.meme_b] : [];
+        }).filter(Boolean)
+      )
+    ];
+
+    const { data: memes, error: memesError } = await supabase
+      .from('memes')
+      .select('id,image_url')
+      .in('id', memeIds);
+
+    if (memesError) {
+      console.error('Ошибка загрузки мемов истории:', memesError);
+    }
+
+    const memeMap = new Map(
+      (memes || []).map(meme => [meme.id, meme])
+    );
+
+    let totalWon = 0;
+    let totalLost = 0;
+
+    completedVotes.forEach(vote => {
+      if (!vote.settled_at) return;
+
+      const battle = battleMap.get(vote.battle_id);
+      if (!battle) return;
+
+      const bet = Number(vote.bet_amount || 0);
+      const payout = Number(vote.payout || 0);
+
+      // Ничья: ставка возвращается, изменение баланса — 0.
+      if (!battle.winner_meme_id) {
+        return;
+      }
+
+      // Победа: выплата + ставка.
+      if (battle.winner_meme_id === vote.meme_id) {
+        totalWon += payout + bet;
+      } else {
+        // Поражение: потеря ставки.
+        totalLost += bet;
+      }
+    });
+
+    setStat('coinsWon', totalWon);
+    setStat('coinsLost', totalLost);
+
+    const history = completedVotes.map(vote => {
+      const battle = battleMap.get(vote.battle_id);
+
+      if (!battle) return null;
+
+      const myMeme = memeMap.get(vote.meme_id);
+
+      const opponentId = battle.meme_a === vote.meme_id
+        ? battle.meme_b
+        : battle.meme_a;
+
+      const opponentMeme = memeMap.get(opponentId);
+
+      let result;
+      let resultText;
+      let money = 0;
+      let moneyClass = 'neutral';
+
+      const bet = Number(vote.bet_amount || 0);
+      const payout = Number(vote.payout || 0);
+
       if (!battle.winner_meme_id) {
         result = 'draw';
         resultText = 'Ничья';
+        money = 0;
+        moneyClass = 'neutral';
       } else if (battle.winner_meme_id === vote.meme_id) {
         result = 'win';
         resultText = 'Победа';
+        money = vote.settled_at ? payout + bet : 0;
+        moneyClass = 'positive';
       } else {
         result = 'loss';
         resultText = 'Поражение';
-      }
-    }
-
-    let moneyText = 'Ожидание выплаты';
-    let moneyClass = 'neutral';
-
-    if (vote.settled_at) {
-      const bet = Number(vote.bet_amount || 0);
-      const payout = Number(vote.payout || 0);
-      const difference = payout - bet;
-
-      if (difference > 0) {
-        moneyText = '+' + formatNumber(difference) + ' монет';
-        moneyClass = 'positive';
-      } else if (difference < 0) {
-        moneyText = '-' + formatNumber(Math.abs(difference)) + ' монет';
+        money = vote.settled_at ? -bet : 0;
         moneyClass = 'negative';
-      } else {
-        moneyText = '0 монет';
-        moneyClass = 'neutral';
       }
-    }
 
-    return {
-      vote,
-      battle,
-      selectedMeme,
-      opponentMeme,
-      result,
-      resultText,
-      moneyText,
-      moneyClass
-    };
-  }).filter(Boolean);
+      const moneyText = money > 0
+        ? `+${formatNumber(money)}`
+        : money < 0
+          ? `−${formatNumber(Math.abs(money))}`
+          : '0';
 
-  if (history.length === 0) {
-    container.innerHTML =
-      '<p class="empty">История пока пуста.</p>';
-    return;
-  }
+      return {
+        myImage: myMeme?.image_url || '',
+        opponentImage: opponentMeme?.image_url || '',
+        date: battle.created_at || vote.created_at,
+        result,
+        resultText,
+        moneyText,
+        moneyClass
+      };
+    }).filter(Boolean);
 
-  container.innerHTML = history.map(item => {
-    const selectedImage = item.selectedMeme?.image_url || '';
-    const opponentImage = item.opponentMeme?.image_url || '';
+    container.innerHTML = history.map(item => `
+      <article class="history-card">
+        <div class="history-images">
+          <img
+            src="${escapeHtml(item.myImage)}"
+            alt="Твой мем"
+            loading="lazy"
+          >
+          <span class="history-vs">VS</span>
+          <img
+            src="${escapeHtml(item.opponentImage)}"
+            alt="Мем соперника"
+            loading="lazy"
+          >
+        </div>
 
-    return `
-      <article class="history-item ${item.result}">
-        <div class="history-main">
-          <div class="history-category">
-            ${escapeHtml(getCategoryName(item.battle.duration_seconds))}
-          </div>
-
-          <div class="history-memes">
-            <div class="history-meme">
-              ${
-                selectedImage
-                  ? `<img src="${escapeHtml(selectedImage)}" alt="Твой мем">`
-                  : ''
-              }
-              <span>Твой выбор</span>
-            </div>
-
-            <div class="history-vs">VS</div>
-
-            <div class="history-meme">
-              ${
-                opponentImage
-                  ? `<img src="${escapeHtml(opponentImage)}" alt="Мем соперника">`
-                  : ''
-              }
-              <span>Соперник</span>
-            </div>
-          </div>
-
-          <div class="history-date">
-            ${formatDate(item.vote.created_at)}
-            · Ставка: ${formatNumber(item.vote.bet_amount)} монет
+        <div class="history-info">
+          <div class="history-opponent">Твой мем против соперника</div>
+          <div class="history-date">${escapeHtml(formatDate(item.date))}</div>
+          <div class="history-result ${item.result}">
+            ${item.resultText}
           </div>
         </div>
 
-        <div class="history-result">
-          <span class="result-label ${item.result}">
-            ${item.resultText}
-          </span>
-
-          <div class="money-result ${item.moneyClass}">
-            ${item.moneyText}
-          </div>
+        <div class="history-money ${item.moneyClass}">
+          ${item.moneyText} 🪙
         </div>
       </article>
-    `;
-  }).join('');
-}
-
-// Инициализация профиля
-async function initProfile() {
-  if (!db) {
-    alert('Не найден клиент Supabase. Проверь supabase.js');
-    return;
+    `).join('');
   }
 
-  const { data: { user }, error: authError } = await db.auth.getUser();
-
-  if (authError || !user) {
-    location.replace('login.html');
-    return;
-  }
-
-  document.getElementById('profileEmail').textContent =
-    user.email || '';
-
-  const { data: profile, error: profileError } = await db
-    .from('profiles')
-    .select('username, coins')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  if (profileError) {
-    console.error('Ошибка загрузки профиля:', profileError);
-  }
-
-  const name =
-    profile?.username ||
-    user.email?.split('@')[0] ||
-    'Игрок';
-
-  const balance = Number(profile?.coins ?? 0);
-
-  document.getElementById('username').textContent = name;
-  document.getElementById('profileName').textContent = name;
-
-  document.getElementById('balance').textContent =
-    formatNumber(balance);
-
-  document.getElementById('balanceStat').textContent =
-    formatNumber(balance);
-
-  document.getElementById('avatar').textContent =
-    name[0].toUpperCase();
-
-  await loadMyMemes(user.id);
-  await loadBattleHistory(user.id);
-}
-
-// Выход из аккаунта
-document.getElementById('logoutBtn').addEventListener('click', async () => {
-  if (db) {
-    const { error } = await db.auth.signOut();
-
-    if (error) {
-      alert('Не удалось выйти: ' + error.message);
+  async function initProfile() {
+    if (!supabase) {
+      document.getElementById('username').textContent = 'Ошибка подключения';
       return;
     }
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      window.location.href = 'login.html';
+      return;
+    }
+
+    document.getElementById('email').textContent = user.email || '';
+
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('username,coins')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError) {
+      console.error('Ошибка загрузки профиля:', profileError);
+    }
+
+    const username = profile?.username || 'Игрок';
+
+    document.getElementById('username').textContent = username;
+    document.getElementById('headerUsername').textContent = username;
+    document.getElementById('avatar').textContent =
+      username.charAt(0).toUpperCase();
+
+    setStat('balanceStat', profile?.coins || 0);
+
+    await Promise.all([
+      loadMyMemes(user.id),
+      loadBattleHistory(user.id)
+    ]);
   }
 
-  location.replace('login.html');
-});
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await supabase.auth.signOut();
+    window.location.href = 'login.html';
+  });
 
-initProfile();
+  initProfile();
 </script>
 
 </body>
