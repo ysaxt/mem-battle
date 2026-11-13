@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -232,9 +231,10 @@
       background: #eafff2;
     }
 
+    /* Увеличенные картинки мемов */
     .meme-card img {
       width: 100%;
-      height: 190px;
+      height: 300px;
       object-fit: contain;
       background: #f8faff;
       border-radius: 8px;
@@ -321,7 +321,7 @@
 
     @media (max-width: 850px) {
       .battles-grid { grid-template-columns: 1fr; }
-      .meme-card img { height: 230px; }
+      .meme-card img { height: 280px; }
     }
 
     @media (max-width: 550px) {
@@ -349,7 +349,7 @@
       .battle-card { padding: 10px; }
       .battle-pair { gap: 7px; }
       .meme-card { padding: 6px; }
-      .meme-card img { height: 145px; }
+      .meme-card img { height: 210px; }
 
       .vote-button {
         font-size: 11px;
@@ -505,7 +505,6 @@
           >
 
           <button class="vote-button vote-a">Поставить и выбрать</button>
-
         </div>
 
         <div class="meme-card card-b">
@@ -563,7 +562,6 @@
     if (imageB.src !== row.meme_b_url) {
       imageB.src = row.meme_b_url;
     }
-
 
     const timer = card.querySelector('.battle-timer');
 
@@ -808,8 +806,6 @@
         await refreshBalance();
       }
 
-      await refreshBattles();
-
     } catch (error) {
       alert('Ошибка: ' + error.message);
 
@@ -851,7 +847,7 @@
 
     await refreshBattles();
 
-    setInterval(refreshBattles, 1000);
+    setInterval(refreshBattles, 3000);
 
     setInterval(() => {
       battleElements.forEach((card) => {
