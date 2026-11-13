@@ -323,6 +323,31 @@
       color: #8995a9;
     }
 
+    .history-more {
+      display: block;
+      margin: 18px auto 0;
+      padding: 13px 25px;
+      border: none;
+      border-radius: 10px;
+      background: #1769e0;
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .history-more:hover {
+      background: #0d50b5;
+    }
+
+    .history-more:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    .history-more[hidden] {
+      display: none;
+    }
+
     .empty {
       background: white;
       padding: 28px 18px;
@@ -515,6 +540,7 @@
 
   <section class="section">
     <h2 class="section-title">Мои мемы</h2>
+
     <div class="memes-grid" id="myMemes">
       <div class="loading">Загрузка мемов...</div>
     </div>
@@ -522,9 +548,18 @@
 
   <section class="section">
     <h2 class="section-title">История батлов</h2>
+
     <div class="history-list" id="battleHistory">
       <div class="loading">Загрузка истории...</div>
     </div>
+
+    <button
+      id="loadMoreHistoryBtn"
+      class="history-more"
+      hidden
+    >
+      Показать ещё 10
+    </button>
   </section>
 
 </main>
@@ -534,6 +569,16 @@
 
 <script>
   const supabase = window.supabaseClient;
+
+  // Настройки постраничной загрузки истории.
+  const HISTORY_BATCH_SIZE = 50;
+  const HISTORY_DISPLAY_SIZE = 10;
+
+  let historyOffset = 0;
+  let historyQueue = [];
+  let historyHasMore = true;
+  let historyLoading = false;
+  let currentUserId = null;
 
   function escapeHtml(value) {
     return String(value ?? '').replace(/[&<>"']/g, char => ({
@@ -563,7 +608,10 @@
 
   function setStat(id, value) {
     const element = document.getElementById(id);
-    if (element) element.textContent = formatNumber(value);
+
+    if (element) {
+      element.textContent = formatNumber(value);
+    }
   }
 
   function getStatusName(status) {
@@ -579,9 +627,11 @@
   function getStatusClass(status) {
     if (status === 'approved') return 'approved';
     if (status === 'rejected') return 'rejected';
+
     return 'pending';
   }
 
+  // Загрузка мемов пользователя.
   async function loadMyMemes(userId) {
     const container = document.getElementById('myMemes');
 
@@ -593,27 +643,29 @@
 
     if (error) {
       console.error('Ошибка загрузки мемов:', error);
-      container.innerHTML = '<div class="empty">Не удалось загрузить мемы</div>';
+      container.innerHTML =
+        '<div class="empty">Не удалось загрузить мемы</div>';
       return;
     }
 
-    memes = memes || [];
+    const memeList = memes || [];
 
-    setStat('memesCount', memes.length);
+    setStat('memesCount', memeList.length);
 
-    const totalWins = memes.reduce(
+    const totalWins = memeList.reduce(
       (sum, meme) => sum + Number(meme.wins || 0),
       0
     );
 
     setStat('winsCount', totalWins);
 
-    if (!memes.length) {
-      container.innerHTML = '<div class="empty">Ты пока не загрузил ни одного мема</div>';
+    if (!memeList.length) {
+      container.innerHTML =
+        '<div class="empty">Ты пока не загрузил ни одного мема</div>';
       return;
     }
 
-    container.innerHTML = memes.map(meme => `
+    container.innerHTML = memeList.map(meme => `
       <article class="meme-card">
         <img
           src="${escapeHtml(meme.image_url)}"
@@ -623,6 +675,7 @@
 
         <div class="meme-info">
           <span>Побед: ${formatNumber(meme.wins)}</span>
+
           <span class="status ${getStatusClass(meme.status)}">
             ${escapeHtml(getStatusName(meme.status))}
           </span>
@@ -637,222 +690,341 @@
     `).join('');
   }
 
-  async function loadBattleHistory(userId) {
-    const container = document.getElementById('battleHistory');
+  // Загрузка одной порции голосов и связанных с ними батлов.
+  async function fetchHistoryBatch(userId) {
+    const start = historyOffset;
+    const end = start + HISTORY_BATCH_SIZE - 1;
 
     const { data: votes, error: votesError } = await supabase
       .from('votes')
       .select('id,battle_id,meme_id,bet_amount,payout,settled_at,created_at')
       .eq('user_id', userId)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .range(start, end);
 
     if (votesError) {
-      console.error('Ошибка загрузки голосов:', votesError);
-      container.innerHTML = '<div class="empty">Не удалось загрузить историю</div>';
-      return;
+      throw votesError;
     }
 
     const voteList = votes || [];
 
     if (!voteList.length) {
-      setStat('battlesCount', 0);
-      setStat('coinsWon', 0);
-      setStat('coinsLost', 0);
-      container.innerHTML = '<div class="empty">Ты пока не участвовал в батлах</div>';
+      historyHasMore = false;
       return;
     }
 
-    const battleIds = [...new Set(voteList.map(vote => vote.battle_id))];
+    const battleIds = [
+      ...new Set(voteList.map(vote => vote.battle_id))
+    ];
 
     const { data: battles, error: battlesError } = await supabase
       .from('battles')
-      .select('id,meme_a,meme_b,winner_meme_id,status,duration_seconds,created_at')
+      .select('id,meme_a,meme_b,winner_meme_id,status,created_at')
       .in('id', battleIds);
 
     if (battlesError) {
-      console.error('Ошибка загрузки батлов:', battlesError);
-      container.innerHTML = '<div class="empty">Не удалось загрузить историю батлов</div>';
-      return;
+      throw battlesError;
     }
 
-    const battleMap = new Map((battles || []).map(battle => [battle.id, battle]));
+    const battleMap = new Map(
+      (battles || []).map(battle => [battle.id, battle])
+    );
 
-    // В истории оставляем только завершённые батлы.
+    // Незавершённые батлы в историю не попадают.
     const completedVotes = voteList.filter(vote => {
       const battle = battleMap.get(vote.battle_id);
+
       return battle && battle.status === 'completed';
     });
 
-    const completedBattleIds = new Set(
-      completedVotes.map(vote => vote.battle_id)
-    );
+    let items = [];
 
-    setStat('battlesCount', completedBattleIds.size);
+    if (completedVotes.length) {
+      const memeIds = [
+        ...new Set(
+          completedVotes.flatMap(vote => {
+            const battle = battleMap.get(vote.battle_id);
 
-    if (!completedVotes.length) {
-      setStat('coinsWon', 0);
-      setStat('coinsLost', 0);
-      container.innerHTML = '<div class="empty">Завершённых батлов пока нет</div>';
-      return;
+            return battle
+              ? [battle.meme_a, battle.meme_b]
+              : [];
+          }).filter(Boolean)
+        )
+      ];
+
+      const { data: memes, error: memesError } = await supabase
+        .from('memes')
+        .select('id,image_url')
+        .in('id', memeIds);
+
+      if (memesError) {
+        throw memesError;
+      }
+
+      const memeMap = new Map(
+        (memes || []).map(meme => [meme.id, meme])
+      );
+
+      items = completedVotes.map(vote => {
+        const battle = battleMap.get(vote.battle_id);
+
+        const myMeme = memeMap.get(vote.meme_id);
+
+        const opponentId = battle.meme_a === vote.meme_id
+          ? battle.meme_b
+          : battle.meme_a;
+
+        const opponentMeme = memeMap.get(opponentId);
+
+        const bet = Number(vote.bet_amount || 0);
+        const payout = Number(vote.payout || 0);
+
+        let result;
+        let resultText;
+        let money = 0;
+        let moneyClass = 'neutral';
+
+        if (!battle.winner_meme_id) {
+          result = 'draw';
+          resultText = 'Ничья';
+          money = 0;
+          moneyClass = 'neutral';
+
+        } else if (battle.winner_meme_id === vote.meme_id) {
+          result = 'win';
+          resultText = 'Победа';
+
+          if (vote.settled_at) {
+            money = payout + bet;
+          }
+
+          moneyClass = 'positive';
+
+        } else {
+          result = 'loss';
+          resultText = 'Поражение';
+
+          if (vote.settled_at) {
+            money = -bet;
+          }
+
+          moneyClass = 'negative';
+        }
+
+        const moneyText = money > 0
+          ? `+${formatNumber(money)}`
+          : money < 0
+            ? `−${formatNumber(Math.abs(money))}`
+            : '0';
+
+        return {
+          myImage: myMeme?.image_url || '',
+          opponentImage: opponentMeme?.image_url || '',
+          date: battle.created_at || vote.created_at,
+          result,
+          resultText,
+          moneyText,
+          moneyClass
+        };
+      });
     }
 
-    const memeIds = [
-      ...new Set(
-        completedVotes.flatMap(vote => {
-          const battle = battleMap.get(vote.battle_id);
-          return battle ? [battle.meme_a, battle.meme_b] : [];
-        }).filter(Boolean)
-      )
-    ];
+    // Смещаем указатель только после успешной обработки порции.
+    historyOffset += voteList.length;
 
-    const { data: memes, error: memesError } = await supabase
-      .from('memes')
-      .select('id,image_url')
-      .in('id', memeIds);
-
-    if (memesError) {
-      console.error('Ошибка загрузки мемов истории:', memesError);
+    if (voteList.length < HISTORY_BATCH_SIZE) {
+      historyHasMore = false;
     }
 
-    const memeMap = new Map(
-      (memes || []).map(meme => [meme.id, meme])
-    );
-
-    let totalWon = 0;
-    let totalLost = 0;
-
-    completedVotes.forEach(vote => {
-      if (!vote.settled_at) return;
-
-      const battle = battleMap.get(vote.battle_id);
-      if (!battle) return;
-
-      const bet = Number(vote.bet_amount || 0);
-      const payout = Number(vote.payout || 0);
-
-      // Ничья: ставка возвращается, изменение баланса — 0.
-      if (!battle.winner_meme_id) {
-        return;
-      }
-
-      // Победа: выплата + ставка.
-      if (battle.winner_meme_id === vote.meme_id) {
-        totalWon += payout + bet;
-      } else {
-        // Поражение: потеря ставки.
-        totalLost += bet;
-      }
-    });
-
-    setStat('coinsWon', totalWon);
-    setStat('coinsLost', totalLost);
-
-    const history = completedVotes.map(vote => {
-      const battle = battleMap.get(vote.battle_id);
-
-      if (!battle) return null;
-
-      const myMeme = memeMap.get(vote.meme_id);
-
-      const opponentId = battle.meme_a === vote.meme_id
-        ? battle.meme_b
-        : battle.meme_a;
-
-      const opponentMeme = memeMap.get(opponentId);
-
-      let result;
-      let resultText;
-      let money = 0;
-      let moneyClass = 'neutral';
-
-      const bet = Number(vote.bet_amount || 0);
-      const payout = Number(vote.payout || 0);
-
-      if (!battle.winner_meme_id) {
-        result = 'draw';
-        resultText = 'Ничья';
-        money = 0;
-        moneyClass = 'neutral';
-      } else if (battle.winner_meme_id === vote.meme_id) {
-        result = 'win';
-        resultText = 'Победа';
-        money = vote.settled_at ? payout + bet : 0;
-        moneyClass = 'positive';
-      } else {
-        result = 'loss';
-        resultText = 'Поражение';
-        money = vote.settled_at ? -bet : 0;
-        moneyClass = 'negative';
-      }
-
-      const moneyText = money > 0
-        ? `+${formatNumber(money)}`
-        : money < 0
-          ? `−${formatNumber(Math.abs(money))}`
-          : '0';
-
-      return {
-        myImage: myMeme?.image_url || '',
-        opponentImage: opponentMeme?.image_url || '',
-        date: battle.created_at || vote.created_at,
-        result,
-        resultText,
-        moneyText,
-        moneyClass
-      };
-    }).filter(Boolean);
-
-    container.innerHTML = history.map(item => `
-      <article class="history-card">
-        <div class="history-images">
-          <img
-            src="${escapeHtml(item.myImage)}"
-            alt="Твой мем"
-            loading="lazy"
-          >
-          <span class="history-vs">VS</span>
-          <img
-            src="${escapeHtml(item.opponentImage)}"
-            alt="Мем соперника"
-            loading="lazy"
-          >
-        </div>
-
-        <div class="history-info">
-          <div class="history-opponent">Твой мем против соперника</div>
-          <div class="history-date">${escapeHtml(formatDate(item.date))}</div>
-          <div class="history-result ${item.result}">
-            ${item.resultText}
-          </div>
-        </div>
-
-        <div class="history-money ${item.moneyClass}">
-          ${item.moneyText} 🪙
-        </div>
-      </article>
-    `).join('');
+    historyQueue.push(...items);
   }
 
-  async function initProfile() {
-    if (!supabase) {
-      document.getElementById('username').textContent = 'Ошибка подключения';
+  // Добавление одной записи истории на страницу.
+  function renderHistoryItem(item) {
+    const container = document.getElementById('battleHistory');
+
+    const card = document.createElement('article');
+    card.className = 'history-card';
+
+    card.innerHTML = `
+      <div class="history-images">
+        <img
+          src="${escapeHtml(item.myImage)}"
+          alt="Твой мем"
+          loading="lazy"
+        >
+
+        <span class="history-vs">VS</span>
+
+        <img
+          src="${escapeHtml(item.opponentImage)}"
+          alt="Мем соперника"
+          loading="lazy"
+        >
+      </div>
+
+      <div class="history-info">
+        <div class="history-opponent">
+          Твой мем против соперника
+        </div>
+
+        <div class="history-date">
+          ${escapeHtml(formatDate(item.date))}
+        </div>
+
+        <div class="history-result ${item.result}">
+          ${item.resultText}
+        </div>
+      </div>
+
+      <div class="history-money ${item.moneyClass}">
+        ${item.moneyText} 🪙
+      </div>
+    `;
+
+    container.appendChild(card);
+  }
+
+  // Первоначальная загрузка истории.
+  async function loadBattleHistory(userId) {
+    const container = document.getElementById('battleHistory');
+    const button = document.getElementById('loadMoreHistoryBtn');
+
+    historyOffset = 0;
+    historyQueue = [];
+    historyHasMore = true;
+    historyLoading = false;
+
+    container.innerHTML = '';
+    button.hidden = true;
+
+    await loadMoreHistory(userId);
+  }
+
+  // Показ следующих 10 записей.
+  async function loadMoreHistory(userId) {
+    if (historyLoading) return;
+
+    historyLoading = true;
+
+    const button = document.getElementById('loadMoreHistoryBtn');
+
+    button.hidden = false;
+    button.disabled = true;
+    button.textContent = 'Загружаем...';
+
+    try {
+      // Продолжаем загружать порции, пока не наберём
+      // 10 завершённых батлов или пока история не закончится.
+      while (
+        historyQueue.length < HISTORY_DISPLAY_SIZE &&
+        historyHasMore
+      ) {
+        await fetchHistoryBatch(userId);
+      }
+
+      const container = document.getElementById('battleHistory');
+
+      const nextItems = historyQueue.splice(
+        0,
+        HISTORY_DISPLAY_SIZE
+      );
+
+      nextItems.forEach(renderHistoryItem);
+
+      if (
+        container.children.length === 0 &&
+        !historyHasMore &&
+        historyQueue.length === 0
+      ) {
+        container.innerHTML =
+          '<div class="empty">Ты пока не участвовал в завершённых батлах</div>';
+      }
+
+      const canLoadMore =
+        historyQueue.length > 0 || historyHasMore;
+
+      button.hidden = !canLoadMore;
+      button.disabled = false;
+      button.textContent = 'Показать ещё 10';
+
+    } catch (error) {
+      console.error('Ошибка загрузки истории:', error);
+
+      button.hidden = false;
+      button.disabled = false;
+      button.textContent = 'Повторить загрузку';
+
+    } finally {
+      historyLoading = false;
+    }
+  }
+
+  // Общая статистика за всё время.
+  async function loadBattleStats() {
+    const { data, error } = await supabase.rpc(
+      'get_my_battle_stats'
+    );
+
+    if (error) {
+      console.error('Ошибка статистики батлов:', error);
       return;
     }
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const stats = data?.[0];
+
+    if (!stats) return;
+
+    setStat('battlesCount', stats.battles_count);
+    setStat('coinsWon', stats.coins_won);
+    setStat('coinsLost', stats.coins_lost);
+  }
+
+  // Инициализация профиля.
+  async function initProfile() {
+    if (!supabase) {
+      document.getElementById('username').textContent =
+        'Ошибка подключения';
+      return;
+    }
+
+    // Берём сохранённую сессию без отдельной проверки пользователя
+    // через дополнительный сетевой запрос.
+    const {
+      data: { session },
+      error: authError
+    } = await supabase.auth.getSession();
+
+    const user = session?.user;
 
     if (authError || !user) {
       window.location.href = 'login.html';
       return;
     }
 
-    document.getElementById('email').textContent = user.email || '';
+    currentUserId = user.id;
 
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('username,coins')
-      .eq('id', user.id)
-      .single();
+    document.getElementById('email').textContent =
+      user.email || '';
+
+    // Загружаем профиль, мемы, историю и статистику параллельно.
+    const [
+      profileResult
+    ] = await Promise.all([
+      supabase
+        .from('profiles')
+        .select('username,coins')
+        .eq('id', user.id)
+        .single(),
+
+      loadMyMemes(user.id),
+
+      loadBattleHistory(user.id),
+
+      loadBattleStats()
+    ]);
+
+    const { data: profile, error: profileError } = profileResult;
 
     if (profileError) {
       console.error('Ошибка загрузки профиля:', profileError);
@@ -862,21 +1034,30 @@
 
     document.getElementById('username').textContent = username;
     document.getElementById('headerUsername').textContent = username;
+
     document.getElementById('avatar').textContent =
       username.charAt(0).toUpperCase();
 
     setStat('balanceStat', profile?.coins || 0);
-
-    await Promise.all([
-      loadMyMemes(user.id),
-      loadBattleHistory(user.id)
-    ]);
   }
 
-  document.getElementById('logoutBtn').addEventListener('click', async () => {
-    await supabase.auth.signOut();
-    window.location.href = 'login.html';
-  });
+  // Кнопка выхода.
+  document.getElementById('logoutBtn').addEventListener(
+    'click',
+    async () => {
+      await supabase.auth.signOut();
+      window.location.href = 'login.html';
+    }
+  );
+
+  // Кнопка следующей порции истории.
+  document
+    .getElementById('loadMoreHistoryBtn')
+    .addEventListener('click', async () => {
+      if (currentUserId) {
+        await loadMoreHistory(currentUserId);
+      }
+    });
 
   initProfile();
 </script>
